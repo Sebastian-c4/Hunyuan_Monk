@@ -1,4 +1,4 @@
-DEFINE_ACTION_FUNCTION addkit BEGIN
+DEFINE_ACTION_FUNCTION install_kits BEGIN
 
 	// version check
 	// OUTER_SPRINT VERSION_CHECK ~%LIBS%/version_check~
@@ -30,7 +30,7 @@ DEFINE_ACTION_FUNCTION addkit BEGIN
 		SAY UNIDENTIFIED_DESC @109
 		
 	// define kit
-	INCLUDE ~%LIBS%/addkit.tph~
+	INCLUDE ~%LIBS%/add_kit.tph~
 
 	// fists
 	INCLUDE ~%LIBS%/create_fists.tph~

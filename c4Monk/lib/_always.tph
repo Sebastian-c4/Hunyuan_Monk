@@ -5,9 +5,6 @@ ACTION_IF !VARIABLE_IS_SET always_once_section BEGIN
 	OUTER_SPRINT LIBS			~%mod_root%/lib~
 	OUTER_SPRINT SCRIPTS	~%mod_root%/baf~
 	
-	OUTER_SET c4MonkVer=430
-	OUTER_SET force_tra_rebuild=0
-	
 	INCLUDE ~%LIBS%/_A7functions.tpa~
 	INCLUDE ~%LIBS%/_functions.tpa~
 		

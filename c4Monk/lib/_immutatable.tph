@@ -109,9 +109,10 @@ BEGIN
 	LOCAL_SPRINT key ""
 	ACTION_IF FILE_EXISTS "%ini_to_read%.ini" BEGIN
 		COPY - "%ini_to_read%.ini" "%workspace%"
-			/* REPLACE_EVALUATE ~^\([^ %TAB%%WNL%]+\)=\([^%WNL%$]+\)~ */	
-			// 添加等号两边空格或制表符的识别。队列名改成 ini_hash 方便使用
-			REPLACE_EVALUATE ~^\([^ %TAB%%WNL%]+\)[ %TAB%]*=[ %TAB%]*\([^%WNL%$]+\)~	
+			REPLACE_TEXTUALLY ";.*" ""
+			REPLACE_TEXTUALLY "#.*" ""
+			REPLACE_TEXTUALLY ~[ %TAB%]*=[ %TAB%]*~ ~=~
+			REPLACE_EVALUATE ~^\([^ %TAB%%WNL%]+\)=\([^%WNL%$]+\)~
       BEGIN
 				SPRINT key "%MATCH1%"
 				TO_LOWER key
@@ -201,7 +202,7 @@ ACTION_IF !VARIABLE_IS_SET immutable_initialise BEGIN // only do this once, not 
 	//////////////////////////////////////////////////////////////
 
 	ACTION_IF !VARIABLE_IS_SET mod_root BEGIN
-		OUTER_SPRINT mod_root "%MOD_FOLDER%"
+		OUTER_SPRINT mod_root "%TP2_BASE_NAME%"
 	END
 
 	ACTION_IF !VARIABLE_IS_SET external_loc BEGIN
@@ -222,6 +223,14 @@ ACTION_IF !VARIABLE_IS_SET immutable_initialise BEGIN // only do this once, not 
 
 	ACTION_IF !VARIABLE_IS_SET tra_setup BEGIN
 		OUTER_SPRINT tra_setup setup
+	END
+
+	ACTION_IF !VARIABLE_IS_SET ini_file BEGIN
+		OUTER_SPRINT ini_file config-default
+	END
+
+	ACTION_IF !VARIABLE_IS_SET user_ini_file BEGIN
+		OUTER_SPRINT user_ini_file config
 	END
 
 	//////////////////////////////////////////////////////////////

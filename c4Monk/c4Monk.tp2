@@ -1,7 +1,7 @@
 BACKUP ~_c4mods_external/c4monk/backup~
 AUTHOR ~c4demon@gmail.com~
 
-VERSION ~v4.3~
+VERSION ~v4.4~
 AUTO_EVAL_STRINGS
 
 README ~c4monk/lang/%LANGUAGE%/readme.pdf~
@@ -27,7 +27,8 @@ BEGIN @-101
 DESIGNATED 1
 REQUIRE_PREDICATE GAME_IS ~bgee bg2ee eet~ @-10000
 
-LAF run STR_VAR file=addkit file_loc=components tra=game END
+OUTER_SET c4MonkVer=440
+LAF run STR_VAR file=install_kits file_loc=components tra=game END
 
 BEGIN @-102
 DESIGNATED 2
