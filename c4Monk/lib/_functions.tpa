@@ -777,10 +777,10 @@ END
 				WRITE_ASCIIE 0x280 ~%name%%slot%~ #32
 			COPY_EXISTING blank.bcs ~override/c4obvtmp.bcs~
 			EXTEND_BOTTOM ~c4obvtmp.bcs~ ~.../c4_inlined/create_observer_baldur.baf~ EVAL EVAL
-			COPY_EXISTING_REGEXP GLOB ~^\(bd\)\?baldur\(25\)\?\.bcs$~ override
+			COPY_EXISTING_REGEXP GLOB ~^\(baldur\|baldur25\|bdbaldur\)\.bcs$~ override
 				R_B_B ~override/c4obvtmp.bcs~ ~override/blank.bcs~ ON_MISMATCH END
 			BUT_ONLY
-			EXTEND_BOTTOM_REGEXP ~^\(bd\)\?baldur\(25\)\?\.bcs$~ ~.../c4_inlined/create_observer_baldur.baf~ EVAL EVAL
+			EXTEND_BOTTOM_REGEXP ~^\(baldur\|baldur25\|bdbaldur\)\.bcs$~ ~.../c4_inlined/create_observer_baldur.baf~ EVAL EVAL
 			MOVE ~override/c4obvtmp.bcs~ ~%external_data%/%name%%slot%_baldur.bcs~
 			
 			COPY_EXISTING blank.bcs ~override/%name%%slot%.bcs~
@@ -825,10 +825,10 @@ END
 			WRITE_ASCIIE 0x280 ~%name%~ #32
 		COPY_EXISTING blank.bcs ~override/c4obvtmp.bcs~
 		EXTEND_BOTTOM ~c4obvtmp.bcs~ ~.../c4_inlined/create_one_observer_baldur1.baf~ EVAL EVAL
-		COPY_EXISTING_REGEXP GLOB ~^\(bd\)\?baldur\(25\)\?\.bcs$~ override
+		COPY_EXISTING_REGEXP GLOB ~^\(baldur\|baldur25\|bdbaldur\)\.bcs$~ override
 			R_B_B ~override/c4obvtmp.bcs~ ~override/blank.bcs~ ON_MISMATCH END
 		BUT_ONLY
-		EXTEND_BOTTOM_REGEXP ~^\(bd\)\?baldur\(25\)\?\.bcs$~ ~.../c4_inlined/create_one_observer_baldur1.baf~ EVAL EVAL
+		EXTEND_BOTTOM_REGEXP ~^\(baldur\|baldur25\|bdbaldur\)\.bcs$~ ~.../c4_inlined/create_one_observer_baldur1.baf~ EVAL EVAL
 		MOVE ~override/c4obvtmp.bcs~ ~%external_data%/%name%_baldur.bcs~
 		
 		COPY_EXISTING blank.bcs ~override/%name%.bcs~
@@ -851,7 +851,7 @@ THEN
 END
 >>>>>>>>
 	
-	COPY_EXISTING_REGEXP ~^\(bd\)\?baldur\(25\)\?\.bcs$~ override
+	COPY_EXISTING_REGEXP ~^\(baldur\|baldur25\|bdbaldur\)\.bcs$~ override
 		DECOMPILE_AND_PATCH BEGIN
 			REPLACE_TEXTUALLY ~!Exists("%name%")~ ~False() !Exists("%name%")~
 		END
