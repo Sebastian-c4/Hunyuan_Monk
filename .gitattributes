@@ -1,0 +1,39 @@
+# 换行符统一策略：index 里存 LF，工作区检出为 CRLF。
+# 有这个文件后，两台 Windows 机器都不必再设 core.autocrlf，
+# 也不会再出现 "LF will be replaced by CRLF" 警告。
+* text=auto eol=crlf
+
+# 二进制资源：不做任何换行转换
+*.bam binary
+*.bmp binary
+*.spl binary
+*.itm binary
+*.cre binary
+*.dlg binary
+*.tlk binary
+*.eff binary
+*.vvc binary
+*.wav binary
+*.ogg binary
+*.tis binary
+*.mos binary
+*.wed binary
+*.are binary
+*.pro binary
+*.exe binary
+*.zip binary
+*.7z binary
+*.rar binary
+
+# WeiDU 文本：显式声明，避免被误判
+*.tp2 text eol=crlf
+*.tph text eol=crlf
+*.tpa text eol=crlf
+*.d   text eol=crlf
+*.baf text eol=crlf
+*.tra text eol=crlf
+*.2da text eol=crlf
+*.ids text eol=crlf
+*.ini text eol=crlf
+*.bat text eol=crlf
+*.md  text eol=crlf
