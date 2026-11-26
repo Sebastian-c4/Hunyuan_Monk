@@ -84,7 +84,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf5%level%%effect%~ END
 		END
 		PATCH_IF i=5 THEN BEGIN
-			PATCH_FOR_EACH effect IN b x BEGIN
+			PATCH_FOR_EACH effect IN b BEGIN
 				LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf5%level%%effect%~ END
 			END
 		END
@@ -96,13 +96,26 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 	ACTION_IF i=5 THEN
 	BEGIN
 		LAF CREATE_EFFECT INT_VAR match_opcode=248 opcode=146 target=2 timing=0 parameter2=1 probability1=15 STR_VAR name=~c4mkf5%level%b~ resource=~c4mkf5%level%b.spl~ END
-		LAF CREATE_EFFECT INT_VAR match_opcode=248 opcode=321 target=1 timing=0 parameter2=2 STR_VAR name=~c4mkf5%level%x~ END
 
 		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf5%level%b.spl~
-			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=250 target=1 timing=0 duration=6 parameter1=25 parameter2=0 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=250 target=1 timing=0 parameter1=25 parameter2=0 END
 			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=1 dicenumber=1 dicesize=10 parameter2=1<<24 END
 			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=139 target=1 timing=1 parameter1=RESOLVE_STR_REF (@1571) END
-			LPF ALTER_EFFECT INT_VAR match_opcode=248 target=1 timing=0 duration=6 probability1=100 probability2=0 STR_VAR resource=~c5mkf5ex~ END
+			// 模板里的 248 只作克隆源，克隆完删掉（原本靠它挂 c4mkf5ex，把增益限成一次命中）
+			LPF DELETE_EFFECT INT_VAR match_opcode=248 END
+			// 248 在本击基础伤害结算之后才触发，触发那一下改不成最大伤害；
+			// 只能让随后的攻击吃伤害幸运。窗口取 23 tick（约 1.5 秒）。
+			// WeiDU 的 duration 以秒计，要精确控制 tick 只能按原始偏移写（Duration 在 effect+0x0e）。
+			GET_OFFSET_ARRAY header SPL_V10_HEADERS
+			PHP_EACH header AS int => index BEGIN
+				GET_OFFSET_ARRAY2 efs index SPL_V10_HEAD_EFFECTS
+				PHP_EACH efs AS int => offset BEGIN
+					READ_SHORT offset found_opcode
+					PATCH_IF found_opcode=250 BEGIN
+						WRITE_LONG offset+0x0e 23
+					END
+				END
+			END
 	END
 
 	//点穴手
@@ -142,11 +155,11 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 
 	ACTION_IF i=1 THEN BEGIN
 		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf7c1.spl~
-			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=317 target=1 timing=0 duration=6 parameter1=0 parameter2=1 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=317 target=1 timing=0 duration=4 parameter1=0 parameter2=1 END
 			LPF ALTER_EFFECT INT_VAR match_opcode=248 opcode=139 target=1 timing=1 parameter1=RESOLVE_STR_REF (@1761) END
 
 		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf7a1.spl~
-			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=317 target=1 timing=0 duration=6 parameter1=0 parameter2=0 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=317 target=1 timing=0 duration=4 parameter1=0 parameter2=0 END
 			LPF ALTER_EFFECT INT_VAR match_opcode=248 opcode=139 target=1 timing=1 parameter1=RESOLVE_STR_REF (@1761) END
 	END
 
