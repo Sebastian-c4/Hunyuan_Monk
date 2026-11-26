@@ -22,12 +22,7 @@ IF ~Global("c4MonkDialog","Locals",0)
 	IF ~~ THEN DO ~
 		SetInterrupt(FALSE)
 		SetGlobal("c4MonkBodyTrainingHLA","Locals",2)
-		ReallyForceSpellRES("c4mkbd00",Myself)
-		AddSpecialAbility("c4mkbdx-")
-		AddSpecialAbility("c4mkbdx-")
-		AddSpecialAbility("c4mkbdx-")
-		AddSpecialAbility("c4mkbdx-")
-		AddSpecialAbility("c4mkbdx-")
+		ReallyForceSpellRES("c4mkgbx",Myself)
 		SetGlobal("c4MonkBodyTrainingHLA","Locals",3)
 		SetInterrupt(TRUE)~ EXIT
 END
@@ -49,34 +44,20 @@ IF ~~ THEN BEGIN bodytraining
 	+ ~Global("c4MonkBodyTraining","Locals",4) LevelLT(Myself,30)~ + @207 + gotskillpoint
 	+ ~Global("c4MonkBodyTraining","Locals",0) !LevelLT(Myself,6)~ + @201 DO ~
 		SetGlobal("c4MonkBodyTraining","Locals",1)
-		AddSpecialAbility("c4mkbda-")~ + done
+		ReallyForceSpellRES("c4mkgb1",Myself)~ + done
 	+ ~Global("c4MonkBodyTraining","Locals",1) !LevelLT(Myself,12)~ + @202 DO ~
 		SetGlobal("c4MonkBodyTraining","Locals",2)
-		ReallyForceSpellRES("c4mkbd00",Myself)
-		AddSpecialAbility("c4mkbdb-")
-		AddSpecialAbility("c4mkbdb-")~ + done
+		ReallyForceSpellRES("c4mkgb2",Myself)~ + done
 	+ ~Global("c4MonkBodyTraining","Locals",2) !LevelLT(Myself,18)~ + @203 DO ~
 		SetGlobal("c4MonkBodyTraining","Locals",3)
-		ReallyForceSpellRES("c4mkbd00",Myself)
-		AddSpecialAbility("c4mkbdc-")
-		AddSpecialAbility("c4mkbdc-")
-		AddSpecialAbility("c4mkbdc-")~ + done
+		ReallyForceSpellRES("c4mkgb3",Myself)~ + done
 	+ ~Global("c4MonkBodyTraining","Locals",3) !LevelLT(Myself,24)~ + @204 DO ~
 		SetGlobal("c4MonkBodyTraining","Locals",4)
-		ReallyForceSpellRES("c4mkbd00",Myself)
-		AddSpecialAbility("c4mkbdd-")
-		AddSpecialAbility("c4mkbdd-")
-		AddSpecialAbility("c4mkbdd-")
-		AddSpecialAbility("c4mkbdd-")~ + done
+		ReallyForceSpellRES("c4mkgb4",Myself)~ + done
 	+ ~Global("c4MonkBodyTraining","Locals",4) !LevelLT(Myself,30)~ + @205 DO ~
 		SetGlobal("c4MonkBodyTraining","Locals",5)
-		ReallyForceSpellRES("c4mkbd00",Myself)
-		ReallyForceSpellRES("c4mkbdx0",Myself)
-		AddSpecialAbility("c4mkbde-")
-		AddSpecialAbility("c4mkbde-")
-		AddSpecialAbility("c4mkbde-")
-		AddSpecialAbility("c4mkbde-")
-		AddSpecialAbility("c4mkbde-")~ + done
+		ReallyForceSpellRES("c4mkgb5",Myself)
+		ReallyForceSpellRES("c4mkbdx0",Myself)~ + done
 	++ @104 + gotskillpoint
 END
 

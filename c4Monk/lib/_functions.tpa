@@ -235,6 +235,26 @@ END
 
 /* **************************************** */
 	
+/* 生成「发放法术」：清掉 5 个旧身法选择器，再一次性给 count 个 ability。
+   opcode 171 在效果循环里执行，不经过精灵动作队列，所以不会像连写 AddSpecialAbility 那样被清掉。 */
+DEFINE_ACTION_FUNCTION c4mk_grant_spell
+	INT_VAR
+		count=1
+	STR_VAR
+		spell=~~
+		ability=~~
+BEGIN
+	LAF CREATE_EMPTY_SPELL STR_VAR name=~%spell%~ END
+	COPY_EXISTING ~%spell%.spl~ override
+		PATCH_FOR_EACH bd IN a b c d e BEGIN
+			LPF ADD_SPELL_EFFECT INT_VAR opcode=172 target=2 timing=9 STR_VAR resource=~c4mkbd%bd%-~ END
+		END
+		FOR (n=1;n<=count;++n) BEGIN
+			LPF ADD_SPELL_EFFECT INT_VAR opcode=171 target=2 timing=9 STR_VAR resource=~%ability%~ END
+		END
+	BUT_ONLY
+END
+
 DEFINE_ACTION_FUNCTION C4_HANDLE_CHARSETS 
 	STR_VAR
 		lang_path=~~

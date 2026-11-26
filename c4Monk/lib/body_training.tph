@@ -88,6 +88,13 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 		LPF ALTER_EFFECT INT_VAR power=0 resist_dispel=0 END
 END
 
+//身法发放法术：c4mkgb1..5 = 清旧选择器 + 发 i 个（身法等级内部是用 a~e 编码的）
+LAF c4mk_grant_spell INT_VAR count=1 STR_VAR spell=~c4mkgb1~ ability=~c4mkbda-~ END
+LAF c4mk_grant_spell INT_VAR count=2 STR_VAR spell=~c4mkgb2~ ability=~c4mkbdb-~ END
+LAF c4mk_grant_spell INT_VAR count=3 STR_VAR spell=~c4mkgb3~ ability=~c4mkbdc-~ END
+LAF c4mk_grant_spell INT_VAR count=4 STR_VAR spell=~c4mkgb4~ ability=~c4mkbdd-~ END
+LAF c4mk_grant_spell INT_VAR count=5 STR_VAR spell=~c4mkgb5~ ability=~c4mkbde-~ END
+
 
 ////高等身法
 LAF CREATE_EMPTY_SPELL STR_VAR name=c4mkbdx END
@@ -111,7 +118,10 @@ COPY ~%mod_root%/spl/base/c4mkbd0-.spl~ ~override/c4mkbdx-.spl~
 	SAY NAME1 @2007
 	SAY UNIDENTIFIED_DESC @2008
 	LPF ALTER_EFFECT STR_VAR resource=~c4mkbdx~ END
-	
+
+//高等身法发放法术：清旧选择器 + 发 5 个 c4mkbdx-
+LAF c4mk_grant_spell INT_VAR count=5 STR_VAR spell=~c4mkgbx~ ability=~c4mkbdx-~ END
+
 OUTER_SET	bdx_duration=300
 
 //铁布衫
