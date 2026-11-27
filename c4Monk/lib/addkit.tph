@@ -53,6 +53,10 @@ COPY ~%mod_root%/2da/clabc4mk.2da~ override
 	FOR (i=4;i<cols;i+=4) BEGIN
 		SET_2DA_ENTRY_LATER new_line 6 i ~AP_C4MKAC1~
 	END
+	//技能点发放：偶数级 → 施放 c4mksp%i%（309 Set c4mkspg = i/2）
+	FOR (i=2;i<cols;i+=2) BEGIN
+		SET_2DA_ENTRY_LATER new_line 7 i ~AP_C4MKSP%i%~
+	END
 	SET_2DA_ENTRIES_NOW new_line cols
 	PRETTY_PRINT_2DA
 	

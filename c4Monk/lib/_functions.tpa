@@ -758,6 +758,9 @@ IF
 	!GlobalTimerNotExpired("%name%%slot%_Exists_Timer","Global")
 THEN
 	RESPONSE #100
+		// 生成在区域入口点 [1.1]。少数没有 [1.1] 的地图会生成失败——可接受：
+		// 鸟只负责"修补"，拳头本身由 CLAB 每级发放。
+		// （试过 CreateCreatureObjectOffScreen：只是当前视野外，走回去仍会被它挡路）
 		CreateCreatureImpassable("%name%%slot%",[1.1],0)
 		Continue()
 END

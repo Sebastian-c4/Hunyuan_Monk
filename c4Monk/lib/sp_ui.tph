@@ -1,0 +1,10 @@
+// v5.0：技能点面板（EEex 依赖）
+// .menu 是纯文本 MENU 资源（参照 EEex 自带的 B3Timer.menu），Lua 走 EEex 的 M_*.lua 自动加载。
+
+ACTION_IF (FILE_EXISTS_IN_GAME ~EEex_Sprite.lua~) OR (FILE_EXISTS ~override/EEex_Sprite.lua~) BEGIN
+	COPY ~%mod_root%/menu/c4mksp.menu~ ~override/c4mksp.menu~
+	COPY ~%mod_root%/lua/M_C4MK.lua~   ~override/M_C4MK.lua~
+	PRINT ~c4Monk: 已安装技能点面板（c4mksp.menu + M_C4MK.lua）~
+END ELSE BEGIN
+	WARN ~c4Monk v5.0 需要 EEex。未检测到 EEex，技能点面板未安装（其余组件不受影响）。~
+END

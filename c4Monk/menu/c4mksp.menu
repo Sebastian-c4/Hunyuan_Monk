@@ -1,0 +1,313 @@
+-----------------------
+-- 混元武僧 · 技能点面板
+-- 左栏：身法 / 高等身法 / 心法×4     右栏：拳法×7
+-- 每一行 = 图标 + 可点击的文字（点整行加点）；不可加时整行变灰
+-- 文字与可用状态都由 M_C4MK.lua 提供
+-----------------------
+
+menu
+{
+	name "C4MonkSp_Menu"
+	ignoreesc
+
+	-- 全屏透明层：让引擎在面板外也能正常恢复光标（参照 B3Timer.menu）
+	label
+	{
+		area 0 0 2147483647 2147483647
+		enabled true
+	}
+
+	-- 面板背景（占位，后续换 BAM）
+	label
+	{
+		area 100 120 820 470
+		enabled true
+		rectangle 5
+		rectangle opacity 800
+	}
+
+	-- 标题
+	label
+	{
+		area 120 134 360 26
+		enabled true
+		text "混元武僧 · 技能点"
+		text align left center
+	}
+
+	-- 剩余 / 已加 / 共
+	label
+	{
+		area 500 134 400 26
+		enabled true
+		text lua "C4MK_Summary"
+		text align right center
+	}
+
+	--------------- 左栏标题 ---------------
+
+	label
+	{
+		area 120 172 240 20
+		enabled true
+		text "〔身法〕"
+		text align left center
+	}
+
+	label
+	{
+		area 120 268 240 20
+		enabled true
+		text "〔心法〕"
+		text align left center
+	}
+
+	--------------- 身法 ---------------
+
+	label
+	{
+		area 120 196 32 32
+		bam "C4MKBD1D"
+		scaleToClip
+	}
+
+	text
+	{
+		area 160 196 300 28
+		action "C4MK_Buy('body')"
+		actionAlt "C4MK_Buy('body')"
+		text lua "C4MK_Text('body')"
+		text align left center
+		enabled "C4MK_CanBuy('body')"
+	}
+
+	--------------- 高等身法（只读） ---------------
+
+	label
+	{
+		area 120 232 32 32
+		bam "C4MKBDB"
+		scaleToClip
+	}
+
+	label
+	{
+		area 160 232 300 28
+		enabled true
+		text lua "C4MK_Text('bodyx')"
+		text align left center
+	}
+
+	--------------- 心法 ×4 ---------------
+
+	label
+	{
+		area 120 292 32 32
+		bam "C4MKIMMU"
+		scaleToClip
+	}
+
+	text
+	{
+		area 160 292 300 28
+		action "C4MK_Buy('m1')"
+		actionAlt "C4MK_Buy('m1')"
+		text lua "C4MK_Text('m1')"
+		text align left center
+		enabled "C4MK_CanBuy('m1')"
+	}
+
+	label
+	{
+		area 120 328 32 32
+		bam "C4MKRAGB"
+		scaleToClip
+	}
+
+	text
+	{
+		area 160 328 300 28
+		action "C4MK_Buy('m2')"
+		actionAlt "C4MK_Buy('m2')"
+		text lua "C4MK_Text('m2')"
+		text align left center
+		enabled "C4MK_CanBuy('m2')"
+	}
+
+	label
+	{
+		area 120 364 32 32
+		bam "C4MKREVB"
+		scaleToClip
+	}
+
+	text
+	{
+		area 160 364 300 28
+		action "C4MK_Buy('m3')"
+		actionAlt "C4MK_Buy('m3')"
+		text lua "C4MK_Text('m3')"
+		text align left center
+		enabled "C4MK_CanBuy('m3')"
+	}
+
+	label
+	{
+		area 120 400 32 32
+		bam "C4MKSNIB"
+		scaleToClip
+	}
+
+	text
+	{
+		area 160 400 300 28
+		action "C4MK_Buy('m4')"
+		actionAlt "C4MK_Buy('m4')"
+		text lua "C4MK_Text('m4')"
+		text align left center
+		enabled "C4MK_CanBuy('m4')"
+	}
+
+	--------------- 右栏标题 ---------------
+
+	label
+	{
+		area 520 172 240 20
+		enabled true
+		text "〔拳法〕"
+		text align left center
+	}
+
+	--------------- 拳法 ×7 ---------------
+
+	label
+	{
+		area 520 196 32 32
+		bam "C4MKC1"
+		scaleToClip
+	}
+
+	text
+	{
+		area 560 196 336 28
+		action "C4MK_Buy('f1')"
+		actionAlt "C4MK_Buy('f1')"
+		text lua "C4MK_Text('f1')"
+		text align left center
+		enabled "C4MK_CanBuy('f1')"
+	}
+
+	label
+	{
+		area 520 232 32 32
+		bam "C4MKC2"
+		scaleToClip
+	}
+
+	text
+	{
+		area 560 232 336 28
+		action "C4MK_Buy('f2')"
+		actionAlt "C4MK_Buy('f2')"
+		text lua "C4MK_Text('f2')"
+		text align left center
+		enabled "C4MK_CanBuy('f2')"
+	}
+
+	label
+	{
+		area 520 268 32 32
+		bam "C4MKC3"
+		scaleToClip
+	}
+
+	text
+	{
+		area 560 268 336 28
+		action "C4MK_Buy('f3')"
+		actionAlt "C4MK_Buy('f3')"
+		text lua "C4MK_Text('f3')"
+		text align left center
+		enabled "C4MK_CanBuy('f3')"
+	}
+
+	label
+	{
+		area 520 304 32 32
+		bam "C4MKC4"
+		scaleToClip
+	}
+
+	text
+	{
+		area 560 304 336 28
+		action "C4MK_Buy('f4')"
+		actionAlt "C4MK_Buy('f4')"
+		text lua "C4MK_Text('f4')"
+		text align left center
+		enabled "C4MK_CanBuy('f4')"
+	}
+
+	label
+	{
+		area 520 340 32 32
+		bam "C4MKC5"
+		scaleToClip
+	}
+
+	text
+	{
+		area 560 340 336 28
+		action "C4MK_Buy('f5')"
+		actionAlt "C4MK_Buy('f5')"
+		text lua "C4MK_Text('f5')"
+		text align left center
+		enabled "C4MK_CanBuy('f5')"
+	}
+
+	label
+	{
+		area 520 376 32 32
+		bam "C4MKCATB"
+		scaleToClip
+	}
+
+	text
+	{
+		area 560 376 336 28
+		action "C4MK_Buy('f6')"
+		actionAlt "C4MK_Buy('f6')"
+		text lua "C4MK_Text('f6')"
+		text align left center
+		enabled "C4MK_CanBuy('f6')"
+	}
+
+	label
+	{
+		area 520 412 32 32
+		bam "C4MKBD1D"
+		scaleToClip
+	}
+
+	text
+	{
+		area 560 412 336 28
+		action "C4MK_Buy('f7')"
+		actionAlt "C4MK_Buy('f7')"
+		text lua "C4MK_Text('f7')"
+		text align left center
+		enabled "C4MK_CanBuy('f7')"
+	}
+
+	--------------- 关闭 ---------------
+
+	text
+	{
+		area 800 556 100 26
+		enabled true
+		action "C4MK_Close()"
+		actionAlt "C4MK_Close()"
+		text "关闭"
+		text align center center
+	}
+}

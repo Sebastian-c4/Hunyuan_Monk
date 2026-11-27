@@ -44,6 +44,9 @@ DEFINE_ACTION_FUNCTION addkit BEGIN
 	INCLUDE ~%LIBS%/mental_training.tph~
 	INCLUDE ~%LIBS%/observers.tph~
 
+	// v5.0 技能点面板（EEex）
+	INCLUDE ~%LIBS%/sp_ui.tph~
+
 	// HLAs
 	INCLUDE ~%LIBS%/HLAs.tph~
 	

@@ -103,9 +103,17 @@ COPY_EXISTING c4mkbdx.spl override
 	SAY UNIDENTIFIED_DESC @2008
 	WRITE_ASCII 0x3a c4mkbdxb
 	LPF ALTER_SPELL_HEADER STR_VAR icon=c4mkbdxb END
+	// HLA 选中即完成发放：清掉 a~e 选择器，再发 5 个 c4mkbdx-
+	// （替代旧对话里 c4MonkBodyTrainingHLA 1→2→3 的三步流程）
+	PATCH_FOR_EACH bd IN a b c d e BEGIN
+		LPF ADD_SPELL_EFFECT INT_VAR opcode=172 target=2 timing=9 STR_VAR resource=~c4mkbd%bd%-~ END
+	END
+	FOR (n=1;n<=5;++n) BEGIN
+		LPF ADD_SPELL_EFFECT INT_VAR opcode=171 target=2 timing=9 STR_VAR resource=~c4mkbdx-~ END
+	END
 	LPF ADD_SPELL_EFFECT INT_VAR opcode=177 target=2 timing=1 parameter2=2 STR_VAR resource=~c4mkbdx~ END
 	
-LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=1 STR_VAR name=c4mkbdx variable=c4MonkBodyTrainingHLA END
+LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=1 STR_VAR name=c4mkbdx variable=c4mkbdx END
 	
 COPY_EXISTING c4mkbd.bam ~override/c4mkbdxb.bam~
 

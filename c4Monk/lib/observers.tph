@@ -16,13 +16,7 @@ OUTER_FOR (PN=1;PN<7;++PN) BEGIN
 	COPY ~%workspace%/c4MonkP%PN%.baf~ ~%workspace%/c4MonkP%PN%.baf~
 		APPEND_FILE_EVALUATE ~%SCRIPTS%/ensure_helm.baf~
 		
-	// 技能点和触发对话
-	COPY ~%workspace%/c4MonkP%PN%.baf~ ~%workspace%/c4MonkP%PN%.baf~
-		APPEND_FILE_EVALUATE ~%SCRIPTS%/start_dialog.baf~
-		// APPEND_FILE_EVALUATE ~%SCRIPTS%/more_skill_point.baf~
-		FOR (level=2;level<51;level+=2) BEGIN
-			APPEND_FILE_EVALUATE ~%SCRIPTS%/add_skill_point.baf~
-		END
+	// 对话已退役：技能点面板由先天能力 GA_C4MKSKI1 打开
 		
 	//编译
 	EXTEND_BOTTOM ~c4MonkP%PN%.bcs~ ~%workspace%/c4MonkP%PN%.baf~ EVAL
