@@ -68,7 +68,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 	LAF CREATE_EFFECT INT_VAR opcode=139 timing=1 parameter1=0x500 probability2=chance STR_VAR name=~c4mkf3%level%2~ END
 	LAF CREATE_EFFECT INT_VAR opcode=12 timing=1 parameter2=4<<16 dicenumber=i dicesize=4 STR_VAR name=~c4mkf3%level%a~ END
 	
-	//酸 噬心
+	//酸 蚀骨
 	COPY_EXISTING ~c4mkf4%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 a BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf4%level%%effect%~ END
@@ -78,7 +78,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 	LAF CREATE_EFFECT INT_VAR opcode=0 timing=9 parameter1=~-1~ probability2=chance STR_VAR name=~c4mkf4%level%1~ END
 	LAF CREATE_EFFECT INT_VAR opcode=12 timing=1 parameter2=1<<16 dicenumber=i dicesize=4 STR_VAR name=~c4mkf4%level%a~ END
 	
-	//金刚掌
+	//斩铁
 	COPY_EXISTING ~c4mkf5%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 2 a BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf5%level%%effect%~ END
@@ -118,7 +118,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 			END
 	END
 
-	//点穴手
+	//穿心
 	COPY_EXISTING ~c4mkf6%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 2 a BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf6%level%%effect%~ END
@@ -147,7 +147,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 			LPF ALTER_EFFECT INT_VAR match_opcode=248 opcode=139 target=2 timing=1 parameter1=RESOLVE_STR_REF (@1671) END
 	END
 	
-	//螳螂拳
+	//疾风
 	COPY_EXISTING ~c4mkf7%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf7%level%%effect%~ END
@@ -183,7 +183,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 			END
 		END
 
-	//螳螂拳伤害惩罚
+	//疾风伤害惩罚
 	COPY_EXISTING_REGEXP GLOB ~c4mkf7%level%.spl~ override
 		decrease= i=5 ? ~-5~ : i*~-2~
 		GET_OFFSET_ARRAY header SPL_V10_HEADERS
