@@ -3,15 +3,38 @@
 -- 依赖：EEex v1.3.1（Infinity_PushMenu / EEex_Sprite_*LocalInt / EEex_Action_* / EEex_Key_*）
 -- 语法约束：必须同时能在 Lua 5.2.4 与 LuaJIT 2.1(5.1) 下运行 —— 不用 goto / 整除 / 位运算 / table.unpack。
 
+-- 没有用 InfinityLoader.exe 启动时 EEex 不活动，直接退出（M___EEex.lua 也会先报错）
+if EEex_Active == false then return end
+
 C4MK_MenuName = "C4MonkSp_Menu"
 C4MK_IsOpen   = false
 C4MK_Sprite   = nil      -- 页面锁定的角色（开页时定格，避免串号）
 C4MK_Summary  = ""
+C4MK_Ignore   = 0        -- 关闭后要跳过的 402 触发次数
+C4MK_ClosedAt = nil      -- 关闭时刻（os.time），用于 2 秒冷却
+
+-- 排查用面包屑：排查完把 C4MK_DEBUG 改成 false 即可全部静音
+C4MK_DEBUG = true
+function C4MK_Dbg(msg)
+	if not C4MK_DEBUG then return end
+	local line = "[C4MK] " .. tostring(msg)
+	if Infinity_DisplayString then pcall(Infinity_DisplayString, line) end
+	pcall(print, line)
+end
 
 -- v5.0 记账模型（只有一个点数变量）：
 --   c4mkspg = 已发放总数的高水位，由 CLAB 在偶数级 Set 成 i/2（只增不减 → 漏发的级会被下一级补齐）
 --   剩余点数 = c4mkspg - 已花费，纯派生值，不落盘 → 不存在"点数记错"
 C4MK_GRANTED_VAR = "c4mkspg"
+
+-- 当前时间（秒）。没有 os.time 时返回 0，冷却逻辑自动退化为计数方式
+function C4MK_Now()
+	if os and os.time then
+		local ok, t = pcall(os.time)
+		if ok and type(t) == "number" then return t end
+	end
+	return 0
+end
 
 local function loc(sprite, name)
 	if not sprite then return 0 end
@@ -22,6 +45,34 @@ local function repeat_str(s, n)
 	local out = ""
 	for i = 1, n do out = out .. s end
 	return out
+end
+
+-- 按显示宽度折行：ASCII 记 1，UTF-8 多字节字符（中文）记 2。
+-- 不用 utf8 库，LuaJIT(5.1) 没有；也不用 goto。
+function C4MK_Wrap(text, maxw)
+	local out, linew, i, n = {}, 0, 1, #text
+	while i <= n do
+		local b = text:byte(i)
+		local len = 1
+		if b >= 0xF0 then len = 4
+		elseif b >= 0xE0 then len = 3
+		elseif b >= 0xC0 then len = 2 end
+		local ch = text:sub(i, i + len - 1)
+		if ch == "\n" then
+			out[#out + 1] = "\n"
+			linew = 0
+		else
+			local w = (len == 1) and 1 or 2
+			if linew + w > maxw and linew > 0 then
+				out[#out + 1] = "\n"
+				linew = 0
+			end
+			out[#out + 1] = ch
+			linew = linew + w
+		end
+		i = i + len
+	end
+	return table.concat(out)
 end
 
 ----------------------------------------------------------------------
@@ -223,7 +274,8 @@ function C4MK_Tip(id)
 
 	local desc = txt("desc_" .. id)
 	if desc and desc ~= "" then
-		return head .. "\n" .. body .. "\n\n" .. desc
+		-- 中文没有空格，引擎不会自动折行，按显示宽度手工插入换行
+		return head .. "\n" .. body .. "\n\n" .. C4MK_Wrap(desc, 24)
 	end
 	return head .. "\n" .. body
 end
@@ -238,24 +290,49 @@ end
 -- 页面开关
 ----------------------------------------------------------------------
 
+-- 页面是否真的在屏上：优先问引擎（Infinity_IsMenuOnStack），
+-- 自己的 C4MK_IsOpen 只是回退，避免被引擎关掉后状态脱节
+function C4MK_IsPanelOpen()
+	if Infinity_IsMenuOnStack then
+		local ok, on = pcall(Infinity_IsMenuOnStack, C4MK_MenuName)
+		if ok then return on == true or on == 1 end
+	end
+	return C4MK_IsOpen
+end
+
 function C4MK_Open(sprite)
 	C4MK_Sprite = sprite or EEex_Sprite_GetSelected()
 	C4MK_Refresh()
-	if not C4MK_IsOpen then
-		Infinity_PushMenu(C4MK_MenuName)
-		C4MK_IsOpen = true
+	C4MK_Dbg("open: sprite=" .. tostring(C4MK_Sprite ~= nil) .. " onStack=" .. tostring(C4MK_IsPanelOpen())
+		.. " menuLoaded=" .. tostring(C4MK_MenuLoaded))
+	if C4MK_IsPanelOpen() then return end
+
+	local ok, err = pcall(Infinity_PushMenu, C4MK_MenuName)
+	C4MK_Dbg("push " .. C4MK_MenuName .. " -> " .. tostring(ok) .. " " .. tostring(err))
+	if C4MK_DEBUG then
+		-- 探针：元素找不到时 Infinity_SetArea 会抛 Lua 错，可据此判断菜单是否真被引擎注册
+		local ok2, err2 = pcall(Infinity_SetArea, "C4MK_Bg", 100, 120, 820, 470)
+		C4MK_Dbg("setarea -> " .. tostring(ok2) .. " " .. tostring(err2))
 	end
+	C4MK_IsOpen = true
 end
 
 function C4MK_Close()
-	if C4MK_IsOpen then
-		Infinity_PopMenu(C4MK_MenuName)
+	if not C4MK_IsPanelOpen() then
 		C4MK_IsOpen = false
+		return
 	end
+
+	local ok, err = pcall(Infinity_PopMenu, C4MK_MenuName)
+	C4MK_Dbg("pop -> " .. tostring(ok) .. " " .. tostring(err))
+	C4MK_IsOpen = false
+	-- 关掉之后紧跟的重复 402 不要再把页面顶回来（次数 + 2 秒冷却双保险）
+	C4MK_Ignore = 2
+	C4MK_ClosedAt = C4MK_Now()
 end
 
 function C4MK_Toggle(sprite)
-	if C4MK_IsOpen then
+	if C4MK_IsPanelOpen() then
 		C4MK_Close()
 	else
 		C4MK_Open(sprite)
@@ -265,18 +342,52 @@ end
 -- opcode 402 回调（函数名必须 ≤8 字符且全大写）
 -- 由先天能力「技能学习」c4mkski1.spl 触发 → 打开技能点面板
 function C4MKUI(op402, sprite)
-	C4MK_Toggle(sprite)
+	C4MK_Dbg("402 fired: sprite=" .. tostring(sprite ~= nil))
+	-- 这道法术会周期性反复触发 402（172 移除自身 + 171 重新给予，效果链反复跑），
+	-- 所以只开不关；关掉后 2 秒内的触发一律忽略，防止“关不掉”。
+	local t = C4MK_Now()
+	if C4MK_ClosedAt and t > 0 and (t - C4MK_ClosedAt) < 2 then
+		C4MK_Dbg("402 ignored (cooldown)")
+		return
+	end
+	if C4MK_Ignore > 0 then
+		C4MK_Ignore = C4MK_Ignore - 1
+		C4MK_Dbg("402 ignored (close guard)")
+		return
+	end
+	if not C4MK_IsPanelOpen() then C4MK_Open(sprite) end
 end
 
 -- 调试热键（保留，方便排查；不影响玩家）
+--   K = 正式面板    J = 最小测试菜单（验证 .menu 能否被引擎加载）
 if EEex_Key_GetFromName and EEex_Key_AddPressedListener then
 	C4MK_DebugKey = EEex_Key_GetFromName("k")
+	C4MK_TestKey  = EEex_Key_GetFromName("j")
 	EEex_Key_AddPressedListener(function(key)
 		if key == C4MK_DebugKey then
+			C4MK_Dbg("key K pressed")
 			C4MK_Toggle()
+		elseif key == C4MK_TestKey then
+			local ok, err = pcall(Infinity_PushMenu, "C4MKTST_Menu")
+			C4MK_Dbg("key J: test push -> " .. tostring(ok) .. " " .. tostring(err))
 		end
 	end)
 end
 
+-- .menu 放进 override 不会被引擎自动加载：必须调 EEex_Menu_LoadFile 交给引擎，
+-- 且时机要在 UI 主文件加载完成之后（EEex_Menu_AddAfterMainFileLoadedListener）。
+C4MK_MenuLoaded = false
+if EEex_Menu_LoadFile and EEex_Menu_AddAfterMainFileLoadedListener then
+	EEex_Menu_AddAfterMainFileLoadedListener(function()
+		if C4MK_MenuLoaded then return end
+		local ok, err = pcall(EEex_Menu_LoadFile, "c4mksp")
+		C4MK_MenuLoaded = ok
+		pcall(print, "[C4MK] load c4mksp -> " .. tostring(ok) .. " " .. tostring(err))
+		pcall(EEex_Menu_LoadFile, "c4mktst")   -- 排查用最小菜单（按 J 打开）
+	end)
+end
+
 -- 先填一遍默认值，避免菜单在首次刷新前渲染空表报错
+-- 注意：这里不能调用 Infinity_DisplayString —— 本文件由 includes.lua 在 UI 初始化阶段加载，
+-- 此时该函数会触发原生访问违例（0xC0000005），pcall 也挡不住。
 C4MK_Refresh()

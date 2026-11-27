@@ -6,7 +6,8 @@ COPY_EXISTING c4mkski1.spl override
 	// 去掉 base 文件里那条 177 → c4mkskil.eff（它只用来置 c4MonkDialog，对话已退役）
 	LPF DELETE_EFFECT INT_VAR match_opcode=177 END
 	// 用这个先天能力直接打开技能点面板（替代原先的 c4MonkDialog 标记 + start_dialog.baf 对话）
-	LPF ADD_SPELL_EFFECT INT_VAR opcode=402 target=2 timing=1 STR_VAR resource=~C4MKUI~ END
+	// timing=0（瞬发）：timing=1 的永久效果会被引擎反复 decode，导致 402 每秒重复触发
+	LPF ADD_SPELL_EFFECT INT_VAR opcode=402 target=2 timing=0 parameter1=0 parameter2=0 duration=0 STR_VAR resource=~C4MKUI~ END
 
 // v5.0 技能点发放：第 i 级 => c4mksp%i%.spl，由 CLAB 的 AP_C4MKSP%i% 在到级时施放。
 // 只有一条效果：opcode 309 Set c4mkspg = i/2 —— 已发放总数的高水位。

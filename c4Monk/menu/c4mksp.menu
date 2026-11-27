@@ -1,8 +1,7 @@
 -----------------------
 -- 混元武僧 · 技能点面板
 -- 左栏：混元身法 / 高等混元身法 / 心法×4     右栏：拳法×7
--- 每一行 = 图标 + 可点击的文字（点整行加点）；不可加时整行变灰
--- 悬停显示：当前进度 + 下一级花费 + tra 里的技能说明
+-- 每行 = 图标 + 可点文字；不可加时用 clickable 置灰（不用 enabled，否则整行消失）
 -----------------------
 
 menu
@@ -17,31 +16,32 @@ menu
 		enabled true
 	}
 
-	-- 面板背景（占位，后续换 BAM）
+	-- 面板背景：不透明。rectangle 的索引只有 0–4（见 UI.MENU），写 5 画不出来
 	label
 	{
+		name "C4MK_Bg"
 		area 100 120 820 470
 		enabled true
-		rectangle 5
-		rectangle opacity 800
+		rectangle 0
+		rectangle opacity 1000
 	}
 
-	-- 标题
 	label
 	{
 		area 120 134 360 26
 		enabled true
 		text "混元武僧 · 技能点"
 		text align left center
+		text color 255 255 255 255
 	}
 
-	-- 剩余 / 已加 / 共
 	label
 	{
 		area 500 134 400 26
 		enabled true
 		text lua "C4MK_Summary"
 		text align right center
+		text color 255 255 255 255
 	}
 
 	--------------- 左栏标题 ---------------
@@ -52,6 +52,7 @@ menu
 		enabled true
 		text "〔身法〕"
 		text align left center
+		text color 255 255 255 255
 	}
 
 	label
@@ -60,15 +61,23 @@ menu
 		enabled true
 		text "〔心法〕"
 		text align left center
+		text color 255 255 255 255
 	}
-
-	--------------- 混元身法 ---------------
 
 	label
 	{
 		area 120 196 32 32
+		enabled true
 		bam "C4MKBD1D"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 120 196 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('body')"
 	}
 
 	text
@@ -79,16 +88,25 @@ menu
 		tooltip lua "C4MK_Tip('body')"
 		text lua "C4MK_Text('body')"
 		text align left center
-		enabled "C4MK_CanBuy('body')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('body')"
 	}
-
-	--------------- 高等混元身法（只读） ---------------
 
 	label
 	{
 		area 120 232 32 32
+		enabled true
 		bam "C4MKBDB"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 120 232 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('bodyx')"
 	}
 
 	label
@@ -97,15 +115,23 @@ menu
 		enabled true
 		text lua "C4MK_Text('bodyx')"
 		text align left center
+		text color 255 255 255 255
 	}
-
-	--------------- 心法 ×4 ---------------
 
 	label
 	{
 		area 120 292 32 32
+		enabled true
 		bam "C4MKIMMU"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 120 292 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('m1')"
 	}
 
 	text
@@ -116,14 +142,25 @@ menu
 		tooltip lua "C4MK_Tip('m1')"
 		text lua "C4MK_Text('m1')"
 		text align left center
-		enabled "C4MK_CanBuy('m1')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('m1')"
 	}
 
 	label
 	{
 		area 120 328 32 32
+		enabled true
 		bam "C4MKRAGB"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 120 328 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('m2')"
 	}
 
 	text
@@ -134,14 +171,25 @@ menu
 		tooltip lua "C4MK_Tip('m2')"
 		text lua "C4MK_Text('m2')"
 		text align left center
-		enabled "C4MK_CanBuy('m2')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('m2')"
 	}
 
 	label
 	{
 		area 120 364 32 32
+		enabled true
 		bam "C4MKREVB"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 120 364 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('m3')"
 	}
 
 	text
@@ -152,14 +200,25 @@ menu
 		tooltip lua "C4MK_Tip('m3')"
 		text lua "C4MK_Text('m3')"
 		text align left center
-		enabled "C4MK_CanBuy('m3')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('m3')"
 	}
 
 	label
 	{
 		area 120 400 32 32
+		enabled true
 		bam "C4MKSNIB"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 120 400 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('m4')"
 	}
 
 	text
@@ -170,7 +229,9 @@ menu
 		tooltip lua "C4MK_Tip('m4')"
 		text lua "C4MK_Text('m4')"
 		text align left center
-		enabled "C4MK_CanBuy('m4')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('m4')"
 	}
 
 	--------------- 右栏标题 ---------------
@@ -181,15 +242,23 @@ menu
 		enabled true
 		text "〔拳法〕"
 		text align left center
+		text color 255 255 255 255
 	}
-
-	--------------- 拳法 ×7 ---------------
 
 	label
 	{
 		area 520 196 32 32
+		enabled true
 		bam "C4MKC1"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 520 196 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('f1')"
 	}
 
 	text
@@ -200,14 +269,25 @@ menu
 		tooltip lua "C4MK_Tip('f1')"
 		text lua "C4MK_Text('f1')"
 		text align left center
-		enabled "C4MK_CanBuy('f1')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('f1')"
 	}
 
 	label
 	{
 		area 520 232 32 32
+		enabled true
 		bam "C4MKC2"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 520 232 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('f2')"
 	}
 
 	text
@@ -218,14 +298,25 @@ menu
 		tooltip lua "C4MK_Tip('f2')"
 		text lua "C4MK_Text('f2')"
 		text align left center
-		enabled "C4MK_CanBuy('f2')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('f2')"
 	}
 
 	label
 	{
 		area 520 268 32 32
+		enabled true
 		bam "C4MKC3"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 520 268 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('f3')"
 	}
 
 	text
@@ -236,14 +327,25 @@ menu
 		tooltip lua "C4MK_Tip('f3')"
 		text lua "C4MK_Text('f3')"
 		text align left center
-		enabled "C4MK_CanBuy('f3')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('f3')"
 	}
 
 	label
 	{
 		area 520 304 32 32
+		enabled true
 		bam "C4MKC4"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 520 304 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('f4')"
 	}
 
 	text
@@ -254,14 +356,25 @@ menu
 		tooltip lua "C4MK_Tip('f4')"
 		text lua "C4MK_Text('f4')"
 		text align left center
-		enabled "C4MK_CanBuy('f4')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('f4')"
 	}
 
 	label
 	{
 		area 520 340 32 32
+		enabled true
 		bam "C4MKC5"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 520 340 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('f5')"
 	}
 
 	text
@@ -272,14 +385,25 @@ menu
 		tooltip lua "C4MK_Tip('f5')"
 		text lua "C4MK_Text('f5')"
 		text align left center
-		enabled "C4MK_CanBuy('f5')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('f5')"
 	}
 
 	label
 	{
 		area 520 376 32 32
-		bam "C4MKCATB"
+		enabled true
+		bam "C4MKC6"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 520 376 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('f6')"
 	}
 
 	text
@@ -290,14 +414,25 @@ menu
 		tooltip lua "C4MK_Tip('f6')"
 		text lua "C4MK_Text('f6')"
 		text align left center
-		enabled "C4MK_CanBuy('f6')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('f6')"
 	}
 
 	label
 	{
 		area 520 412 32 32
-		bam "C4MKBD1D"
+		enabled true
+		bam "C4MKC7"
 		scaleToClip
+	}
+
+	-- 透明悬停区：让图标也算 tooltip 触发范围
+	text
+	{
+		area 520 412 32 32
+		enabled true
+		tooltip lua "C4MK_Tip('f7')"
 	}
 
 	text
@@ -308,18 +443,31 @@ menu
 		tooltip lua "C4MK_Tip('f7')"
 		text lua "C4MK_Text('f7')"
 		text align left center
-		enabled "C4MK_CanBuy('f7')"
+		text color 255 255 255 255
+		enabled true
+		clickable lua "C4MK_CanBuy('f7')"
 	}
 
-	--------------- 关闭 ---------------
+	--------------- 关闭按钮 ---------------
+
+	label
+	{
+		name "C4MK_CloseBg"
+		area 790 552 110 30
+		enabled true
+		rectangle 1
+		rectangle opacity 1000
+	}
 
 	text
 	{
-		area 800 556 100 26
+		name "C4MK_Close"
+		area 790 552 110 30
 		enabled true
 		action "C4MK_Close()"
 		actionAlt "C4MK_Close()"
 		text "关闭"
 		text align center center
+		text color 255 255 255 255
 	}
 }

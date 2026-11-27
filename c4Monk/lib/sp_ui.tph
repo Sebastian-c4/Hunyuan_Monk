@@ -2,8 +2,11 @@
 // .menu 是纯文本 MENU 资源（参照 EEex 自带的 B3Timer.menu），Lua 走 EEex 的 M_*.lua 自动加载。
 // 名称/说明从 tra 取 strref，注入 M_C4MKT.lua，这样换语言也能跟着变。
 
-ACTION_IF (FILE_EXISTS_IN_GAME ~EEex_Sprite.lua~) OR (FILE_EXISTS ~override/EEex_Sprite.lua~) BEGIN
+// EEex 1.x 把 Lua API 打包进 dll，override 里只留 M___EEex.lua 作标记
+// （内容只有一句 EEex_Active 检查），不能用 EEex_Sprite.lua 探测。
+ACTION_IF (FILE_EXISTS_IN_GAME ~M___EEex.lua~) OR (FILE_EXISTS_IN_GAME ~EEex_Sprite.lua~) BEGIN
 	COPY ~%mod_root%/menu/c4mksp.menu~ ~override/c4mksp.menu~
+	COPY ~%mod_root%/menu/c4mktst.menu~ ~override/c4mktst.menu~
 	COPY ~%mod_root%/lua/M_C4MK.lua~   ~override/M_C4MK.lua~
 
 	// tra → strref（名称）

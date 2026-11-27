@@ -1,0 +1,33 @@
+----------------------------
+-- 排查用最小菜单：只验证「mod 的 .menu 能否被引擎加载 + push」
+-- 按 J 打开，ESC 关闭。确认没问题后可以连同 M_C4MK.lua 里的 J 监听一起删掉。
+----------------------------
+
+menu
+{
+	name "C4MKTST_Menu"
+
+	-- 全屏透明层（和正式面板同款，保证光标行为一致）
+	label
+	{
+		area 0 0 2147483647 2147483647
+		enabled true
+	}
+
+	label
+	{
+		area 200 200 400 120
+		enabled true
+		rectangle 5
+		rectangle opacity 900
+	}
+
+	label
+	{
+		area 200 200 400 120
+		enabled true
+		text "C4MK TEST OK"
+		text style "normal"
+		text align center center
+	}
+}
