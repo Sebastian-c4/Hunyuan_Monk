@@ -1,7 +1,7 @@
 
 IF
 	Kit(Player%PN%,c4Monk)
-	TriggerOverride(Player%PN%,Global("c4MonkMentalTraining1","Locals",1))
+	TriggerOverride(Player%PN%,Global("c4mkm1","Locals",1))
 	!HasItem("c4mkhelm",Player%PN%)
 THEN
 	RESPONSE #100

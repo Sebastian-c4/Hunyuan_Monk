@@ -1,7 +1,7 @@
 
 
-//// ȭ��
-OUTER_FOR (f=1;f<5;++f) BEGIN
+//// 拳法
+OUTER_FOR (f=1;f<9;++f) BEGIN
 	COPY ~%mod_root%/spl/base/c4mkf00.spl~ ~%workspace%/c4mkf%f%0.spl~
 		PATCH_FOR_EACH lvl IN a b c d e BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=321 timing=0 STR_VAR resource=~c4mkf%f%%lvl%~ END
@@ -16,8 +16,12 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 	END
 	OUTER_SET percentage = i=1 ? 5 : i=2 ? 8 : i=3 ? 13 : i=4 ? 21 : 34
 	OUTER_SET chance = 100 - percentage
+
+	//ADDED 4.4
+	OUTER_SET hpercentage = i=1 ? 8 : i=2 ? 11 : i=3 ? 14 : i=4 ? 17 : 20
+	OUTER_SET hchance = 100 - hpercentage
 	
-	//��
+	//冰
 	COPY_EXISTING ~c4mkf1%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 2 a BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf1%level%%effect%~ END
@@ -28,7 +32,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 	LAF CREATE_EFFECT INT_VAR opcode=139 timing=1 parameter1=14000 probability2=chance STR_VAR name=~c4mkf1%level%2~ END
 	LAF CREATE_EFFECT INT_VAR opcode=12 timing=1 parameter2=2<<16 dicenumber=i dicesize=4 STR_VAR name=~c4mkf1%level%a~ END
 
-	//��
+	//火
 	COPY_EXISTING ~c4mkf2%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf2%level%%effect%~ END
@@ -53,7 +57,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 			END
 		END
 		
-	//��
+	//电
 	COPY_EXISTING ~c4mkf3%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 2 a BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf3%level%%effect%~ END
@@ -64,7 +68,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 	LAF CREATE_EFFECT INT_VAR opcode=139 timing=1 parameter1=0x500 probability2=chance STR_VAR name=~c4mkf3%level%2~ END
 	LAF CREATE_EFFECT INT_VAR opcode=12 timing=1 parameter2=4<<16 dicenumber=i dicesize=4 STR_VAR name=~c4mkf3%level%a~ END
 	
-	//�� ����
+	//酸 蚀骨
 	COPY_EXISTING ~c4mkf4%level%.spl~ override
 		PATCH_FOR_EACH effect IN 1 a BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf4%level%%effect%~ END
@@ -74,8 +78,102 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 	LAF CREATE_EFFECT INT_VAR opcode=0 timing=9 parameter1=~-1~ probability2=chance STR_VAR name=~c4mkf4%level%1~ END
 	LAF CREATE_EFFECT INT_VAR opcode=12 timing=1 parameter2=1<<16 dicenumber=i dicesize=4 STR_VAR name=~c4mkf4%level%a~ END
 	
-	//�˺��ͷ�
-	COPY_EXISTING_REGEXP GLOB ~c4mkf[1-4]%level%.spl~ override
+	//斩铁
+	COPY_EXISTING ~c4mkf5%level%.spl~ override
+		PATCH_FOR_EACH effect IN 1 2 a BEGIN
+			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf5%level%%effect%~ END
+		END
+		PATCH_IF i=5 THEN BEGIN
+			PATCH_FOR_EACH effect IN b BEGIN
+				LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf5%level%%effect%~ END
+			END
+		END
+		LPF ALTER_EFFECT INT_VAR match_opcode=278 parameter1=i END
+
+	LAF CREATE_EFFECT INT_VAR opcode=93 parameter1=9 parameter2=1 timing=0 duration=18 probability2=chance STR_VAR name=~c4mkf5%level%1~ END
+	LAF CREATE_EFFECT INT_VAR opcode=139 timing=1 parameter1=RESOLVE_STR_REF (@1561) probability2=chance STR_VAR name=~c4mkf5%level%2~ END
+	LAF CREATE_EFFECT INT_VAR opcode=12 timing=1 parameter2=1<<24 dicenumber=i dicesize=3 STR_VAR name=~c4mkf5%level%a~ END
+	ACTION_IF i=5 THEN
+	BEGIN
+		LAF CREATE_EFFECT INT_VAR match_opcode=248 opcode=146 target=2 timing=0 parameter2=1 probability1=15 STR_VAR name=~c4mkf5%level%b~ resource=~c4mkf5%level%b.spl~ END
+
+		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf5%level%b.spl~
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=250 target=1 timing=10 parameter1=25 parameter2=0 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=1 dicenumber=1 dicesize=10 parameter2=1<<24 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=139 target=1 timing=1 parameter1=RESOLVE_STR_REF (@1571) END
+			// 模板里的 248 只作克隆源，克隆完删掉（原本靠它挂 c4mkf5ex，把增益限成一次命中）
+			LPF DELETE_EFFECT INT_VAR match_opcode=248 END
+			// 248 在本击基础伤害结算之后才触发，触发那一下改不成最大伤害；
+			// 只能让随后的攻击吃伤害幸运。窗口取 23 tick（约 1.5 秒）。
+			// 单位看 timing：0 = Instant/Limited 但 duration 以**秒**计；10 = Instant/Limited 且以 **tick** 计。
+			// 所以必须 timing=10 + 原始 Duration=23，写 timing=0 会变成 23 秒。
+			// Timing 在 effect+0x0c（1 字节），Duration 在 effect+0x0e（4 字节）。
+			GET_OFFSET_ARRAY header SPL_V10_HEADERS
+			PHP_EACH header AS int => index BEGIN
+				GET_OFFSET_ARRAY2 efs index SPL_V10_HEAD_EFFECTS
+				PHP_EACH efs AS int => offset BEGIN
+					READ_SHORT offset found_opcode
+					PATCH_IF found_opcode=250 BEGIN
+						WRITE_BYTE offset+0x0c 10
+						WRITE_LONG offset+0x0e 23
+					END
+				END
+			END
+	END
+
+	//穿心
+	COPY_EXISTING ~c4mkf6%level%.spl~ override
+		PATCH_FOR_EACH effect IN 1 2 a BEGIN
+			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf6%level%%effect%~ END
+		END
+		PATCH_IF i=5 THEN BEGIN
+			PATCH_FOR_EACH effect IN b BEGIN
+				LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf6%level%%effect%~ END
+			END
+		END
+
+		LPF ALTER_EFFECT INT_VAR match_opcode=278 parameter1=i END
+
+	LAF CREATE_EFFECT INT_VAR opcode=362 parameter1=1 parameter2=0 special=0 timing=0 duration=i*3+3 probability2=chance STR_VAR name=~c4mkf6%level%1~ END
+	LAF CREATE_EFFECT INT_VAR opcode=139 timing=1 parameter1=RESOLVE_STR_REF (@1661) probability2=chance STR_VAR name=~c4mkf6%level%2~ END
+	LAF CREATE_EFFECT INT_VAR opcode=12 timing=1 parameter2=1<<20 dicenumber=i dicesize=3 STR_VAR name=~c4mkf6%level%a~ END
+	ACTION_IF i=5 THEN
+	BEGIN
+		LAF CREATE_EFFECT INT_VAR match_opcode=248 opcode=146 target=2 timing=0 parameter2=1 probability1=15 STR_VAR name=~c4mkf6%level%b~ resource=~c4mkf6%level%b.spl~ END
+
+		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf6%level%b.spl~	
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=4 duration=5 parameter1=2 parameter2=1<<20 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=4 duration=4 parameter1=2 parameter2=1<<20 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=4 duration=3 parameter1=2 parameter2=1<<20 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=4 duration=2 parameter1=2 parameter2=1<<20 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=4 duration=1 parameter1=2 parameter2=1<<20 END
+			LPF ALTER_EFFECT INT_VAR match_opcode=248 opcode=139 target=2 timing=1 parameter1=RESOLVE_STR_REF (@1671) END
+	END
+	
+	//疾风
+	COPY_EXISTING ~c4mkf7%level%.spl~ override
+		PATCH_FOR_EACH effect IN 1 BEGIN
+			LPF CLONE_EFFECT INT_VAR match_opcode=278 opcode=248 STR_VAR resource=~c4mkf7%level%%effect%~ END
+		END
+
+	ACTION_IF i=1 THEN BEGIN
+		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf7c1.spl~
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=317 target=1 timing=0 duration=4 parameter1=0 parameter2=1 END
+			LPF ALTER_EFFECT INT_VAR match_opcode=248 opcode=139 target=1 timing=1 parameter1=RESOLVE_STR_REF (@1761) END
+
+		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf7a1.spl~
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=317 target=1 timing=0 duration=4 parameter1=0 parameter2=0 END
+			LPF ALTER_EFFECT INT_VAR match_opcode=248 opcode=139 target=1 timing=1 parameter1=RESOLVE_STR_REF (@1761) END
+	END
+
+	ACTION_IF i>2 THEN BEGIN
+		LAF CREATE_EFFECT INT_VAR opcode=146 parameter1=0 parameter2=1 timing=0 target=1 probability2=hchance STR_VAR name=~c4mkf7%level%1~ resource=~c4mkf7c1~ END
+	END ELSE BEGIN
+		LAF CREATE_EFFECT INT_VAR opcode=146 parameter1=0 parameter2=1 timing=0 target=1 probability2=hchance STR_VAR name=~c4mkf7%level%1~ resource=~c4mkf7a1~ END
+	END
+
+	//其它拳法伤害惩罚
+	COPY_EXISTING_REGEXP GLOB ~c4mkf[1-6]%level%.spl~ override
 		decrease=i*~-2~
 		GET_OFFSET_ARRAY header SPL_V10_HEADERS
 		PHP_EACH header AS int => index BEGIN
@@ -87,6 +185,33 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 				END
 			END
 		END
+
+	//疾风伤害惩罚
+	COPY_EXISTING_REGEXP GLOB ~c4mkf7%level%.spl~ override
+		decrease= i=5 ? ~-5~ : i*~-2~
+		GET_OFFSET_ARRAY header SPL_V10_HEADERS
+		PHP_EACH header AS int => index BEGIN
+			GET_OFFSET_ARRAY2 effect index SPL_V10_HEAD_EFFECTS
+			PHP_EACH effect AS int => offset BEGIN
+				READ_SHORT offset opcode
+				PATCH_IF opcode=73 BEGIN
+					WRITE_LONG offset+4 decrease
+				END
+			END
+		END
+
+	// 各级是"替换"不是"叠加"：学第 i 级时先按来源法术清掉本技能线所有级别的旧效果。
+	// 否则伤害骰会变成 1+2+…+5（5 级斩铁 = 15d3 而非 5d3），
+	// 伤害/命中惩罚也会累加（5 级 = -30 伤害、+15 THAC0，明显不是设计意图）。
+	// v4.x 是靠换拳头 ITM 顺带清掉的（旧 321 指向 c4mkf<线><级>.itm，那些物品已不再生成）。
+	// 321 必须排在最前面，所以 insert_point=0。
+	OUTER_FOR (f=1;f<8;++f) BEGIN
+		COPY_EXISTING ~c4mkf%f%%level%.spl~ ~override~
+			PATCH_FOR_EACH old IN a b c d e BEGIN
+				LPF ADD_SPELL_EFFECT INT_VAR opcode=321 target=2 timing=0 duration=0 insert_point=0 STR_VAR resource=~c4mkf%f%%old%~ END
+			END
+		BUT_ONLY
+	END
 
 END
 

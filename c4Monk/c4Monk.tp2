@@ -1,7 +1,7 @@
 BACKUP ~_c4mods_external/c4monk/backup~
 AUTHOR ~c4demon@gmail.com~
 
-VERSION ~v4.3~
+VERSION ~v4.5~
 AUTO_EVAL_STRINGS
 
 README ~c4monk/lang/%LANGUAGE%/readme.pdf~
@@ -18,7 +18,7 @@ ALWAYS
 END
 
 LANGUAGE
-  ~��������~ 	~schinese~
+  ~简体中文~ 	~schinese~
 							~c4monk/lang/schinese/prompts/prompts-%WEIDU_OS%.tra~
 							~c4monk/lang/schinese/setup.tra~
 							// ~c4monk/lang/schinese/game.tra~
@@ -26,6 +26,8 @@ LANGUAGE
 BEGIN @-101
 DESIGNATED 1
 REQUIRE_PREDICATE GAME_IS ~bgee bg2ee eet~ @-10000
+// 技能点面板走 EEex（Infinity_PushMenu / M_*.lua / .menu），没有 EEex 装了也用不了
+REQUIRE_PREDICATE ((FILE_EXISTS_IN_GAME ~M___EEex.lua~) OR (FILE_EXISTS_IN_GAME ~EEex_Sprite.lua~)) @-10001
 
 LAF run STR_VAR file=addkit file_loc=components tra=game END
 

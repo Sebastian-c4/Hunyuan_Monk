@@ -1,0 +1,42 @@
+// v5.0：技能点面板（EEex 依赖）
+// .menu 是纯文本 MENU 资源（参照 EEex 自带的 B3Timer.menu），Lua 走 EEex 的 M_*.lua 自动加载。
+// 名称/说明从 tra 取 strref，注入 M_C4MKT.lua，这样换语言也能跟着变。
+// EEex 的有无由 tp2 里组件 1 的 REQUIRE_PREDICATE 把关，这里不再判断
+// （M_C4MK.lua 顶部还有 `if EEex_Active == false then return end` 兜底）。
+
+COPY ~%mod_root%/menu/c4mksp.menu~ ~override/c4mksp.menu~
+	COPY ~%mod_root%/lua/M_C4MK.lua~   ~override/M_C4MK.lua~
+
+	// tra → strref（名称）
+	OUTER_SET n_body  = RESOLVE_STR_REF (@200)
+	OUTER_SET n_bodyx = RESOLVE_STR_REF (@2007)
+	OUTER_SET n_m1 = RESOLVE_STR_REF (@311)
+	OUTER_SET n_m2 = RESOLVE_STR_REF (@312)
+	OUTER_SET n_m3 = RESOLVE_STR_REF (@313)
+	OUTER_SET n_m4 = RESOLVE_STR_REF (@314)
+	OUTER_SET n_f1 = RESOLVE_STR_REF (@1100)
+	OUTER_SET n_f2 = RESOLVE_STR_REF (@1200)
+	OUTER_SET n_f3 = RESOLVE_STR_REF (@1300)
+	OUTER_SET n_f4 = RESOLVE_STR_REF (@1400)
+	OUTER_SET n_f5 = RESOLVE_STR_REF (@1500)
+	OUTER_SET n_f6 = RESOLVE_STR_REF (@1600)
+	OUTER_SET n_f7 = RESOLVE_STR_REF (@1700)
+
+	// tra → strref（说明）
+	OUTER_SET d_body   = RESOLVE_STR_REF (@321)
+	OUTER_SET d_bodyx  = RESOLVE_STR_REF (@2008)
+	OUTER_SET d_m1 = RESOLVE_STR_REF (@317)
+	OUTER_SET d_m2 = RESOLVE_STR_REF (@318)
+	OUTER_SET d_m3 = RESOLVE_STR_REF (@319)
+	OUTER_SET d_m4 = RESOLVE_STR_REF (@320)
+	OUTER_SET d_f1 = RESOLVE_STR_REF (@1101)
+	OUTER_SET d_f2 = RESOLVE_STR_REF (@1201)
+	OUTER_SET d_f3 = RESOLVE_STR_REF (@1301)
+	OUTER_SET d_f4 = RESOLVE_STR_REF (@1401)
+	OUTER_SET d_f5 = RESOLVE_STR_REF (@1501)
+	OUTER_SET d_f6 = RESOLVE_STR_REF (@1601)
+	OUTER_SET d_f7 = RESOLVE_STR_REF (@1701)
+
+	COPY ~%mod_root%/lua/M_C4MKT.lua~ ~override/M_C4MKT.lua~ EVAL
+
+	PRINT ~c4Monk: 已安装技能点面板（c4mksp.menu + M_C4MK.lua + M_C4MKT.lua）~

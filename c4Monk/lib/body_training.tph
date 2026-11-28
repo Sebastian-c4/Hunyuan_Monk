@@ -1,8 +1,8 @@
 
-////����
+////身法
 // LAF skill_creation STR_VAR spellname=c4mkbd END
 
-//Сͼ��
+//小图标
 LAF cd_new_portrait_icon INT_VAR string= RESOLVE_STR_REF (@211) STR_VAR bam_file=c4mkbd1d RET c4mkbd1d=icon END
 LAF cd_new_portrait_icon INT_VAR string= RESOLVE_STR_REF (@221) STR_VAR bam_file=c4mkbd2d RET c4mkbd2d=icon END
 LAF cd_new_portrait_icon INT_VAR string= RESOLVE_STR_REF (@231) STR_VAR bam_file=c4mkbd3d RET c4mkbd3d=icon END
@@ -12,7 +12,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 		WRITE_BYTE 0 THIS+48
 	END
 	
-	//������
+	//根法术
 	COPY ~%mod_root%/spl/base/c4mkbd0-.spl~ ~override/c4mkbd%level%-.spl~
 		WRITE_ASCII 0x3a C4MKBD
 		LPF ALTER_SPELL_HEADER STR_VAR icon=C4MKBD END
@@ -21,13 +21,13 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 		SAY 12 @209
 		LPF ALTER_EFFECT STR_VAR resource=~c4mkbd%level%~ END	
 		
-	//ʹ�õı���
+	//使用的表格
 	COPY ~%mod_root%/2da/c4mkbd0.2da~ ~override/c4mkbd%level%.2da~
 		SET_2DA_ENTRY 0 1 3 ~c4mkbd1%level%~
 		SET_2DA_ENTRY 1 1 3 ~c4mkbd2%level%~
 		SET_2DA_ENTRY 2 1 3 ~c4mkbd3%level%~
 		
-	//������
+	//铁布衫
 	COPY ~%mod_root%/spl/base/c4mkbd1.spl~ ~override/c4mkbd1%level%.spl~
 		WRITE_ASCII 0x3a C4MKBD1
 		LPF ALTER_SPELL_HEADER INT_VAR projectile=66 STR_VAR icon=C4MKBD1 END
@@ -40,7 +40,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=142 opcode=321 parameter2=0 timing=0 duration=0 STR_VAR resource=~c4mkbd%bd%%level%~ END
 		END
 	
-	//��Ԫ����
+	//真元护体
 	COPY ~%mod_root%/spl/base/c4mkbd2.spl~ ~override/c4mkbd2%level%.spl~
 		WRITE_ASCII 0x3a C4MKBD2
 		LPF ALTER_SPELL_HEADER INT_VAR projectile=66 STR_VAR icon=C4MKBD2 END
@@ -54,7 +54,7 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 		END
 		// LPF CLONE_EFFECT INT_VAR match_opcode=27 opcode=155 parameter1=0 END 
 	
-	//���ս��
+	//天罡战气
 	COPY ~%mod_root%/spl/base/c4mkbd3.spl~ ~override/c4mkbd3%level%.spl~
 		WRITE_ASCII 0x3a C4MKBD3
 		LPF ALTER_SPELL_HEADER INT_VAR projectile=66 STR_VAR icon=C4MKBD3 END
@@ -88,17 +88,38 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 		LPF ALTER_EFFECT INT_VAR power=0 resist_dispel=0 END
 END
 
+//身法发放法术：c4mkgb1..5 = 清旧选择器 + 发 i 个（身法等级内部是用 a~e 编码的）
+LAF c4mk_grant_spell INT_VAR count=1 STR_VAR spell=~c4mkgb1~ ability=~c4mkbda-~ END
+LAF c4mk_grant_spell INT_VAR count=2 STR_VAR spell=~c4mkgb2~ ability=~c4mkbdb-~ END
+LAF c4mk_grant_spell INT_VAR count=3 STR_VAR spell=~c4mkgb3~ ability=~c4mkbdc-~ END
+LAF c4mk_grant_spell INT_VAR count=4 STR_VAR spell=~c4mkgb4~ ability=~c4mkbdd-~ END
+LAF c4mk_grant_spell INT_VAR count=5 STR_VAR spell=~c4mkgb5~ ability=~c4mkbde-~ END
 
-////�ߵ�����
+// 身法满 5 级 = 高等身法的 HLA 前置（luc4monk.2da 里 AP_C4MKBDX 的 PREREQUISITE 是 AP_C4MKBDX0）。
+// opcode 313 才给这个前置"记账"；v4.5 是对话里 ReallyForceSpellRES("c4mkbdx0") 做的，v5 改面板后漏了。
+COPY_EXISTING ~c4mkgb5.spl~ ~override~
+	LPF ADD_SPELL_EFFECT INT_VAR opcode=313 target=2 timing=9 STR_VAR resource=~C4MKBDX0~ END
+BUT_ONLY
+
+
+////高等身法
 LAF CREATE_EMPTY_SPELL STR_VAR name=c4mkbdx END
 COPY_EXISTING c4mkbdx.spl override
 	SAY NAME1 @2007
 	SAY UNIDENTIFIED_DESC @2008
 	WRITE_ASCII 0x3a c4mkbdxb
 	LPF ALTER_SPELL_HEADER STR_VAR icon=c4mkbdxb END
+	// HLA 选中即完成发放：清掉 a~e 选择器，再发 5 个 c4mkbdx-
+	// （替代旧对话里 c4MonkBodyTrainingHLA 1→2→3 的三步流程）
+	PATCH_FOR_EACH bd IN a b c d e BEGIN
+		LPF ADD_SPELL_EFFECT INT_VAR opcode=172 target=2 timing=9 STR_VAR resource=~c4mkbd%bd%-~ END
+	END
+	FOR (n=1;n<=5;++n) BEGIN
+		LPF ADD_SPELL_EFFECT INT_VAR opcode=171 target=2 timing=9 STR_VAR resource=~c4mkbdx-~ END
+	END
 	LPF ADD_SPELL_EFFECT INT_VAR opcode=177 target=2 timing=1 parameter2=2 STR_VAR resource=~c4mkbdx~ END
 	
-LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=1 STR_VAR name=c4mkbdx variable=c4MonkBodyTrainingHLA END
+LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=1 STR_VAR name=c4mkbdx variable=c4mkbdx END
 	
 COPY_EXISTING c4mkbd.bam ~override/c4mkbdxb.bam~
 
@@ -111,10 +132,13 @@ COPY ~%mod_root%/spl/base/c4mkbd0-.spl~ ~override/c4mkbdx-.spl~
 	SAY NAME1 @2007
 	SAY UNIDENTIFIED_DESC @2008
 	LPF ALTER_EFFECT STR_VAR resource=~c4mkbdx~ END
-	
+
+//高等身法发放法术：清旧选择器 + 发 5 个 c4mkbdx-
+LAF c4mk_grant_spell INT_VAR count=5 STR_VAR spell=~c4mkgbx~ ability=~c4mkbdx-~ END
+
 OUTER_SET	bdx_duration=300
 
-//������
+//铁布衫
 COPY_EXISTING c4mkbd1e.spl ~override/c4mkbd1x.spl~
 	SAY NAME1 @212
 	FOR (bd=1;bd<4;++bd) BEGIN
@@ -133,7 +157,7 @@ LAF CREATE_EMPTY_SPELL STR_VAR name=c4mkbd1y END
 COPY_EXISTING c4mkbd1y.spl override
 	LPF ADD_SPELL_EFFECT INT_VAR opcode=218 target=2 timing=10 duration=100 parameter1=1 END
 	
-//��Ԫ����
+//真元护体
 COPY_EXISTING c4mkbd2e.spl ~override/c4mkbd2x.spl~
 	SAY NAME1 @222
 	FOR (bd=1;bd<4;++bd) BEGIN
@@ -142,7 +166,7 @@ COPY_EXISTING c4mkbd2e.spl ~override/c4mkbd2x.spl~
 	LPF ALTER_EFFECT INT_VAR match_parameter1=75 parameter1=100 END
 	LPF ALTER_EFFECT INT_VAR match_timing=0 duration=bdx_duration END
 	
-//���ս��
+//天罡战气
 COPY_EXISTING c4mkbd3e.spl ~override/c4mkbd3x.spl~
 	SAY NAME1 @232
 	FOR (bd=1;bd<4;++bd) BEGIN

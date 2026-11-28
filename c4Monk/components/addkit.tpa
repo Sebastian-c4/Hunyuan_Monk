@@ -21,7 +21,7 @@ DEFINE_ACTION_FUNCTION addkit BEGIN
 	LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=1 STR_VAR name=c4mkchek variable=c4MonkCheck END
 	LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=c4MonkVer STR_VAR name=c4mkver variable=c4MonkVersion END
 
-	// Ԫ�����
+	// 元神出窍
 	COPY_EXISTING c4mkimmu.spl override
 		WRITE_ASCII 0x3a c4mkimmu
 		LPF ALTER_SPELL_HEADER INT_VAR speed=0 STR_VAR icon=c4mkimmu END
@@ -43,6 +43,9 @@ DEFINE_ACTION_FUNCTION addkit BEGIN
 	INCLUDE ~%LIBS%/body_training.tph~
 	INCLUDE ~%LIBS%/mental_training.tph~
 	INCLUDE ~%LIBS%/observers.tph~
+
+	// v5.0 技能点面板（EEex）
+	INCLUDE ~%LIBS%/sp_ui.tph~
 
 	// HLAs
 	INCLUDE ~%LIBS%/HLAs.tph~

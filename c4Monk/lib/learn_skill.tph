@@ -1,21 +1,21 @@
-
-COPY ~c4monk/dlg/c4MonkD_0.d~ ~c4monk/dlg/c4MonkD.d~
-	REPLACE_TEXTUALLY "DO ~\(.*\)~" "DO ~\1~ %INSTANT_ACTIONS_FLAGS%"
-	REPLACE_TEXTUALLY "\([^%]\)SetGlobal(\(.*\))" "\1%INSTANT_ACTIONS_TOBEX%SetGlobal(\2)"
-
-COMPILE ~%mod_root%/dlg/c4MonkD.d~
-	
 COPY_EXISTING c4mkski1.spl override
 	WRITE_ASCII 0x3a c4mkskib
 	LPF ALTER_SPELL_HEADER STR_VAR icon=c4mkskib END
 	SAY NAME1 @100
 	SAY UNIDENTIFIED_DESC @110
+	// 去掉 base 文件里那条 177 → c4mkskil.eff（它只用来置 c4MonkDialog，对话已退役）
+	LPF DELETE_EFFECT INT_VAR match_opcode=177 END
+	// 用这个先天能力直接打开技能点面板（替代原先的 c4MonkDialog 标记 + start_dialog.baf 对话）
+	// timing=0（瞬发）：timing=1 的永久效果会被引擎反复 decode，导致 402 每秒重复触发
+	LPF ADD_SPELL_EFFECT INT_VAR opcode=402 target=2 timing=0 parameter1=0 parameter2=0 duration=0 STR_VAR resource=~C4MKUI~ END
 
-LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=1 STR_VAR name=c4mkskil variable=c4MonkDialog END
-
+// v5.0 技能点发放：第 i 级 => c4mksp%i%.spl，由 CLAB 的 AP_C4MKSP%i% 在到级时施放。
+// 只有一条效果：opcode 309 Set c4mkspg = i/2 —— 已发放总数的高水位。
+// 剩余点数是派生值（= c4mkspg - 已花费），不落盘，所以不存在"点数记错"。
+// 变量名 ≤8 字符，正好塞进 309 的 resource 字段，不需要 resource2/resource3 拼接。
 OUTER_FOR (i=2;i<51;i+=2) BEGIN
+	OUTER_SET pts = i / 2
 	COPY ~%mod_root%/spl/base/c4mksp0.spl~ ~override/c4mksp%i%.spl~
-		LPF ALTER_EFFECT STR_VAR match_resource=level resource=~c4mksp%i%~ END
-	LAF CREATE_EFFECT INT_VAR opcode=187 timing=1 parameter1=1 STR_VAR name=~c4mksp%i%~ variable=~c4MonkAddSkillPoint%i%~ END
+		LPF DELETE_EFFECT INT_VAR match_opcode=177 END
+		LPF ADD_SPELL_EFFECT INT_VAR opcode=309 target=2 timing=1 parameter1=pts parameter2=0 STR_VAR resource=~c4mkspg~ END
 END
-LAF CREATE_EFFECT INT_VAR opcode=309 timing=1 parameter1=1 parameter2=1 STR_VAR name=~c4mksp0~ resource=~c4MonkSk~ resource2=~illPoint~ END
