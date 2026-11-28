@@ -94,6 +94,10 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 		PATCH_FOR_EACH dmgtype IN 1 2 3 4 7 8 BEGIN
 			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=332 parameter1=i*10 parameter2=dmgtype STR_VAR resource=~~ END
 		END
+		//满蓄力最后一击：暴击范围 +7（1d20 掷 13 及以上即暴击）
+		//暴击在攻击掷骰时结算，所以必须挂在满蓄力这一层（d），不能挂在命中后的终结技（x）
+		//时长与其它满蓄力效果一致；出手后 x 里的 321 会按 c4mkc%i%d 清掉整层
+		LPF ADD_SPELL_EFFECT INT_VAR opcode=301 target=2 timing=0 duration=18 parameter1=7 parameter2=0 special=1 END
 		//终结技
 		LPF ALTER_EFFECT STR_VAR match_resource=~c4mkc%i%e~ resource=~c4mkc%i%x~ END
 	

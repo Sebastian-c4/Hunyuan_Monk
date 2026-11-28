@@ -2,6 +2,7 @@
 -- 混元武僧 · 技能点面板
 -- 左栏：混元身法 / 高等混元身法 / 心法×4     右栏：拳法×7
 -- 每行 = 图标 + 可点文字；不可加时用 clickable 置灰（不用 enabled，否则整行消失）
+-- 字号用 text point（只影响页面文字；tooltip 是引擎自己画的，尺寸不受这里影响）
 -----------------------
 
 menu
@@ -16,30 +17,42 @@ menu
 		enabled true
 	}
 
-	-- 面板背景：不透明。rectangle 的索引只有 0–4（见 UI.MENU），写 5 画不出来
+	-- 面板背景：rectangle 兜底（索引只有 0–4，写 5 画不出来）
 	label
 	{
 		name "C4MK_Bg"
-		area 100 120 820 470
+		area 100 120 820 344
 		enabled true
 		rectangle 0
 		rectangle opacity 1000
 	}
 
+	-- 真正的底板：生成的不透明 BAM（820x470），颜色/不透明度都可控
 	label
 	{
-		area 120 134 360 26
+		name "C4MK_BgArt"
+		area 100 120 820 344
+		enabled true
+		bam "C4MKSPBG"
+		scaleToClip
+	}
+
+	label
+	{
+		area 120 132 360 30
 		enabled true
 		text "混元武僧 · 技能点"
+		text point 18
 		text align left center
 		text color 255 255 255 255
 	}
 
 	label
 	{
-		area 500 134 400 26
+		area 420 132 356 30
 		enabled true
 		text lua "C4MK_Summary"
+		text point 14
 		text align right center
 		text color 255 255 255 255
 	}
@@ -48,27 +61,29 @@ menu
 
 	label
 	{
-		area 120 172 240 20
+		area 120 170 240 24
 		enabled true
 		text "〔身法〕"
+		text point 15
 		text align left center
-		text color 255 255 255 255
+		text color 220 200 160 255
 	}
 
 	label
 	{
-		area 120 268 240 20
+		area 120 266 240 24
 		enabled true
 		text "〔心法〕"
+		text point 15
 		text align left center
-		text color 255 255 255 255
+		text color 220 200 160 255
 	}
 
 	label
 	{
 		area 120 196 32 32
 		enabled true
-		bam "C4MKBD1D"
+		bam "C4MKBD"
 		scaleToClip
 	}
 
@@ -87,6 +102,7 @@ menu
 		actionAlt "C4MK_Buy('body')"
 		tooltip lua "C4MK_Tip('body')"
 		text lua "C4MK_Text('body')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -114,6 +130,7 @@ menu
 		area 160 232 300 28
 		enabled true
 		text lua "C4MK_Text('bodyx')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 	}
@@ -122,7 +139,7 @@ menu
 	{
 		area 120 292 32 32
 		enabled true
-		bam "C4MKIMMU"
+		bam "C4MKM1B"
 		scaleToClip
 	}
 
@@ -141,6 +158,7 @@ menu
 		actionAlt "C4MK_Buy('m1')"
 		tooltip lua "C4MK_Tip('m1')"
 		text lua "C4MK_Text('m1')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -151,7 +169,7 @@ menu
 	{
 		area 120 328 32 32
 		enabled true
-		bam "C4MKRAGB"
+		bam "C4MKM2B"
 		scaleToClip
 	}
 
@@ -170,6 +188,7 @@ menu
 		actionAlt "C4MK_Buy('m2')"
 		tooltip lua "C4MK_Tip('m2')"
 		text lua "C4MK_Text('m2')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -180,7 +199,7 @@ menu
 	{
 		area 120 364 32 32
 		enabled true
-		bam "C4MKREVB"
+		bam "C4MKM3B"
 		scaleToClip
 	}
 
@@ -199,6 +218,7 @@ menu
 		actionAlt "C4MK_Buy('m3')"
 		tooltip lua "C4MK_Tip('m3')"
 		text lua "C4MK_Text('m3')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -209,7 +229,7 @@ menu
 	{
 		area 120 400 32 32
 		enabled true
-		bam "C4MKSNIB"
+		bam "C4MKM4B"
 		scaleToClip
 	}
 
@@ -228,6 +248,7 @@ menu
 		actionAlt "C4MK_Buy('m4')"
 		tooltip lua "C4MK_Tip('m4')"
 		text lua "C4MK_Text('m4')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -238,18 +259,19 @@ menu
 
 	label
 	{
-		area 520 172 240 20
+		area 520 170 240 24
 		enabled true
 		text "〔拳法〕"
+		text point 15
 		text align left center
-		text color 255 255 255 255
+		text color 220 200 160 255
 	}
 
 	label
 	{
 		area 520 196 32 32
 		enabled true
-		bam "C4MKC1"
+		bam "C4MKF1B"
 		scaleToClip
 	}
 
@@ -268,6 +290,7 @@ menu
 		actionAlt "C4MK_Buy('f1')"
 		tooltip lua "C4MK_Tip('f1')"
 		text lua "C4MK_Text('f1')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -278,7 +301,7 @@ menu
 	{
 		area 520 232 32 32
 		enabled true
-		bam "C4MKC2"
+		bam "C4MKF2B"
 		scaleToClip
 	}
 
@@ -297,6 +320,7 @@ menu
 		actionAlt "C4MK_Buy('f2')"
 		tooltip lua "C4MK_Tip('f2')"
 		text lua "C4MK_Text('f2')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -307,7 +331,7 @@ menu
 	{
 		area 520 268 32 32
 		enabled true
-		bam "C4MKC3"
+		bam "C4MKF3B"
 		scaleToClip
 	}
 
@@ -326,6 +350,7 @@ menu
 		actionAlt "C4MK_Buy('f3')"
 		tooltip lua "C4MK_Tip('f3')"
 		text lua "C4MK_Text('f3')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -336,7 +361,7 @@ menu
 	{
 		area 520 304 32 32
 		enabled true
-		bam "C4MKC4"
+		bam "C4MKF4B"
 		scaleToClip
 	}
 
@@ -355,6 +380,7 @@ menu
 		actionAlt "C4MK_Buy('f4')"
 		tooltip lua "C4MK_Tip('f4')"
 		text lua "C4MK_Text('f4')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -365,7 +391,7 @@ menu
 	{
 		area 520 340 32 32
 		enabled true
-		bam "C4MKC5"
+		bam "C4MKF5B"
 		scaleToClip
 	}
 
@@ -384,6 +410,7 @@ menu
 		actionAlt "C4MK_Buy('f5')"
 		tooltip lua "C4MK_Tip('f5')"
 		text lua "C4MK_Text('f5')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -394,7 +421,7 @@ menu
 	{
 		area 520 376 32 32
 		enabled true
-		bam "C4MKC6"
+		bam "C4MKF6B"
 		scaleToClip
 	}
 
@@ -413,6 +440,7 @@ menu
 		actionAlt "C4MK_Buy('f6')"
 		tooltip lua "C4MK_Tip('f6')"
 		text lua "C4MK_Text('f6')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
@@ -423,7 +451,7 @@ menu
 	{
 		area 520 412 32 32
 		enabled true
-		bam "C4MKC7"
+		bam "C4MKF7B"
 		scaleToClip
 	}
 
@@ -442,18 +470,20 @@ menu
 		actionAlt "C4MK_Buy('f7')"
 		tooltip lua "C4MK_Tip('f7')"
 		text lua "C4MK_Text('f7')"
+		text point 15
 		text align left center
 		text color 255 255 255 255
 		enabled true
 		clickable lua "C4MK_CanBuy('f7')"
 	}
 
-	--------------- 关闭按钮 ---------------
+	--------------- 关闭按钮（右上角）---------------
+	-- 放右上而不是右下：下方信息栏拉大时会盖住面板底部，按钮点不到
 
 	label
 	{
 		name "C4MK_CloseBg"
-		area 790 552 110 30
+		area 796 128 110 30
 		enabled true
 		rectangle 1
 		rectangle opacity 1000
@@ -462,11 +492,12 @@ menu
 	text
 	{
 		name "C4MK_Close"
-		area 790 552 110 30
+		area 796 128 110 30
 		enabled true
 		action "C4MK_Close()"
 		actionAlt "C4MK_Close()"
 		text "关闭"
+		text point 15
 		text align center center
 		text color 255 255 255 255
 	}

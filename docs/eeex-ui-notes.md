@@ -90,8 +90,10 @@ PopMenu  → onclose → 元素从显示栈移除
 
 - 多个菜单可同时在栈上，后 push 的在上层、先收输入。
 - 关闭方式：面板内按钮调 `Infinity_PopMenu("<name>")`；`ignoreesc` 时 ESC 无效。
-- **防止"关了又弹回来"**：如果打开动作是脚本/效果触发（如 opcode 402），关闭后要加一段忽略窗口
-  （本项目：关闭后 2 秒冷却 + 忽略接下来 2 次触发），否则重复触发会立刻把面板顶回来。
+- **防止"关了又弹回来"**：如果打开动作是脚本/效果触发（如 opcode 402），关闭后加一段**时间窗口**抑制
+  （本项目：关闭后 2 秒内的触发忽略）；另外"已经开着就直接返回"。
+  **不要用"忽略接下来 N 次触发"的计数**：计数没人清零，会把之后真实的一次施法吃掉——
+  表现就是"第一次用技能没反应，按几次才行"。
 
 ---
 
@@ -111,7 +113,15 @@ PopMenu  → onclose → 元素从显示栈移除
 - **图标不出 tooltip**：`label { bam ... }` 本身不触发悬停。在同样的 `area` 上叠一个只含
   `enabled true` + `tooltip lua` 的**透明 `text` 元素**（UI.MENU 里就是这种"纯悬停块"），
   悬停块上不要加 `action`。
-- 深色不透明底 + 白字是最稳的组合；字号/字体（`text point` / `text font`）会与 UI 缩放相互作用，需实测。
+- **字号**：`text point <n>` 在小节里对 `label` / `text` / `button` 都合法（UI.MENU 里有 45 处写在 `text`
+  元素内，不是只给 `label`）。它只改元素自己的文字，**tooltip 不受影响**——想让页面字大、悬停提示不变大，
+  加 `text point` 就够，不要去动全局字体。
+- **底色**：`rectangle` 只能用引擎预置样式（0–4），颜色/纹理不可控，`opacity 1000` 也未必真的全不透明。
+  要确定的深色底板就生成一张同尺寸的不透明 BAM，`bam` + `scaleToClip` 铺满，`rectangle` 留在下面兜底。
+- **关闭按钮放右上，别放右下**：消息栏/文字框被玩家拉大后会盖住面板底部，右下角的按钮看着在、点不到。
+  右上角放进标题条里最稳（顺带把右对齐的汇总行收窄让位）。
+- `bam` 引用的 resref 不存在时**不报错**，只是那块空白；"某个图标没显示"先核对 menu 里的 resref 与
+  `c4Monk/bam/` 里的文件名。
 
 ---
 
@@ -132,7 +142,9 @@ Lua 两个运行时都要跑：`lua52.exe`（5.2.4）与 `tools/luajit_run.py`�
 
 - `.menu` 只需 `COPY ... ~override~`；注册由 Lua 完成（BB-PKG §2.3 明确不 patch UI.MENU）。
 - 安装期依赖检查推荐 `REQUIRE_PREDICATE (MOD_IS_INSTALLED ~EEex.tp2~ (ID_OF_LABEL ~EEex.tp2~ ~B3-EEex-Main~))`，
-  用 label 而不是组件号，EEex 改编号也不会失效。本项目目前是 `ACTION_IF` + `WARN`（软失败）。
+  用 label 而不是组件号，EEex 改编号也不会失效。本项目目前是 `REQUIRE_PREDICATE ((FILE_EXISTS_IN_GAME
+  ~M___EEex.lua~) OR (FILE_EXISTS_IN_GAME ~EEex_Sprite.lua~)) @-10001`（组件 1 直接不可装，`sp_ui.tph`
+  不再做 `ACTION_IF`/`WARN`）。
 - 运行期守卫：`if EEex_Active == false then return end`（没用 InfinityLoader 启动时直接退出）。
 - 探测 EEex 是否安装：看 `override/M___EEex.lua`（128 字节标记文件），**不是** `EEex_Sprite.lua`。
 
@@ -148,6 +160,8 @@ Lua 两个运行时都要跑：`lua52.exe`（5.2.4）与 `tools/luajit_run.py`�
 6. `Infinity_PushMenu` 假成功 → 以为菜单坏了，其实是没注册。
 7. 用 `EEex_Sprite.lua` 探测 EEex → 永远探测不到。
 8. `ni` 不校验 `.menu` → 菜单问题只能游戏内观察。
+9. 用"忽略接下来 N 次 402"做关闭守卫 → 计数残留，之后真实施法被吃掉，表现成"技能点了没反应、按几次才行"。
+   改成时间窗口（关闭后 2 秒）+ "已开着就返回"。
 
 ---
 

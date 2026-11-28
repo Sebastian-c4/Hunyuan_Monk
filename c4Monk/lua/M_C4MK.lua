@@ -10,11 +10,13 @@ C4MK_MenuName = "C4MonkSp_Menu"
 C4MK_IsOpen   = false
 C4MK_Sprite   = nil      -- 页面锁定的角色（开页时定格，避免串号）
 C4MK_Summary  = ""
-C4MK_Ignore   = 0        -- 关闭后要跳过的 402 触发次数
-C4MK_ClosedAt = nil      -- 关闭时刻（os.time），用于 2 秒冷却
+C4MK_ClosedAt = nil      -- 关闭时刻（os.time），用于 2 秒内不重复弹回
 
--- 排查用面包屑：排查完把 C4MK_DEBUG 改成 false 即可全部静音
-C4MK_DEBUG = true
+-- 调试开关（发布版全部关闭）
+--   C4MK_DEBUG     = true  消息栏/控制台打 [C4MK] 面包屑，并跑 C4MK_Open 里的 SetArea 探针
+--   C4MK_DEBUG_KEY = true  注册 K 键开关面板（正式入口是先天能力「技能学习」）
+C4MK_DEBUG = false
+C4MK_DEBUG_KEY = false
 function C4MK_Dbg(msg)
 	if not C4MK_DEBUG then return end
 	local line = "[C4MK] " .. tostring(msg)
@@ -27,7 +29,7 @@ end
 --   剩余点数 = c4mkspg - 已花费，纯派生值，不落盘 → 不存在"点数记错"
 C4MK_GRANTED_VAR = "c4mkspg"
 
--- 当前时间（秒）。没有 os.time 时返回 0，冷却逻辑自动退化为计数方式
+-- 当前时间（秒）。没有 os.time 时返回 0，此时不做"刚关闭"抑制
 function C4MK_Now()
 	if os and os.time then
 		local ok, t = pcall(os.time)
@@ -207,6 +209,10 @@ function C4MK_Buy(id)
 	EEex_Sprite_SetLocalInt(sp, line.var, n)
 	EEex_Action_ExecuteResponseStringOnAIBaseInstantly(
 		'ReallyForceSpellRES("' .. C4MK_BuySpell(line, n) .. '",Myself)', sp)
+	-- 身法满级：c4mkgb5 自带 313，等于已打上 HLA 前置标志，这里只记"发过了"
+	if line.kind == "body" and n >= line.max then
+		EEex_Sprite_SetLocalInt(sp, "c4mkbdxm", 1)
+	end
 	C4MK_Refresh()
 	return true
 end
@@ -286,6 +292,19 @@ function C4MK_Refresh()
 		" 点 · 已加 " .. C4MK_Spent(sp) .. " / 共 " .. C4MK_Granted(sp)
 end
 
+-- 身法满 5 级要打 HLA 前置标志 AP_C4MKBDX0（opcode 313），否则高等身法在 HLA
+-- 界面根本不出现。新版由 c4mkgb5 自己带标志，这里只补 v5 之前就满级、身上没标志
+-- 的老存档；c4mkbdxm 在这里置位，所以只会补一次。
+function C4MK_EnsureBodyHLA(sprite)
+	if not sprite then return end
+	if loc(sprite, "c4mkbd") < 5 then return end
+	if loc(sprite, "c4mkbdxm") >= 1 then return end
+	EEex_Sprite_SetLocalInt(sprite, "c4mkbdxm", 1)
+	EEex_Action_ExecuteResponseStringOnAIBaseInstantly(
+		'ReallyForceSpellRES("c4mkbdx0",Myself)', sprite)
+	C4MK_Dbg("grant body HLA marker c4mkbdx0")
+end
+
 ----------------------------------------------------------------------
 -- 页面开关
 ----------------------------------------------------------------------
@@ -302,6 +321,8 @@ end
 
 function C4MK_Open(sprite)
 	C4MK_Sprite = sprite or EEex_Sprite_GetSelected()
+	-- 补标志是附带动作，失败也不能挡住开页
+	pcall(C4MK_EnsureBodyHLA, C4MK_Sprite)
 	C4MK_Refresh()
 	C4MK_Dbg("open: sprite=" .. tostring(C4MK_Sprite ~= nil) .. " onStack=" .. tostring(C4MK_IsPanelOpen())
 		.. " menuLoaded=" .. tostring(C4MK_MenuLoaded))
@@ -311,7 +332,7 @@ function C4MK_Open(sprite)
 	C4MK_Dbg("push " .. C4MK_MenuName .. " -> " .. tostring(ok) .. " " .. tostring(err))
 	if C4MK_DEBUG then
 		-- 探针：元素找不到时 Infinity_SetArea 会抛 Lua 错，可据此判断菜单是否真被引擎注册
-		local ok2, err2 = pcall(Infinity_SetArea, "C4MK_Bg", 100, 120, 820, 470)
+		local ok2, err2 = pcall(Infinity_SetArea, "C4MK_Bg", 100, 120, 820, 344)
 		C4MK_Dbg("setarea -> " .. tostring(ok2) .. " " .. tostring(err2))
 	end
 	C4MK_IsOpen = true
@@ -326,8 +347,8 @@ function C4MK_Close()
 	local ok, err = pcall(Infinity_PopMenu, C4MK_MenuName)
 	C4MK_Dbg("pop -> " .. tostring(ok) .. " " .. tostring(err))
 	C4MK_IsOpen = false
-	-- 关掉之后紧跟的重复 402 不要再把页面顶回来（次数 + 2 秒冷却双保险）
-	C4MK_Ignore = 2
+	-- 只记关闭时刻：同一次施法里多出来的 402 不要立刻把页面顶回来。
+	-- 不要用"忽略 N 次"的计数 —— 那个计数没人清零，会把之后真实的一次施法也吃掉。
 	C4MK_ClosedAt = C4MK_Now()
 end
 
@@ -343,33 +364,24 @@ end
 -- 由先天能力「技能学习」c4mkski1.spl 触发 → 打开技能点面板
 function C4MKUI(op402, sprite)
 	C4MK_Dbg("402 fired: sprite=" .. tostring(sprite ~= nil))
-	-- 这道法术会周期性反复触发 402（172 移除自身 + 171 重新给予，效果链反复跑），
-	-- 所以只开不关；关掉后 2 秒内的触发一律忽略，防止“关不掉”。
+	-- 只开不关；已经在屏上就直接返回（同一次施法可能 decode 两遍）
+	if C4MK_IsPanelOpen() then return end
 	local t = C4MK_Now()
 	if C4MK_ClosedAt and t > 0 and (t - C4MK_ClosedAt) < 2 then
-		C4MK_Dbg("402 ignored (cooldown)")
+		C4MK_Dbg("402 ignored (just closed)")
 		return
 	end
-	if C4MK_Ignore > 0 then
-		C4MK_Ignore = C4MK_Ignore - 1
-		C4MK_Dbg("402 ignored (close guard)")
-		return
-	end
-	if not C4MK_IsPanelOpen() then C4MK_Open(sprite) end
+	C4MK_Open(sprite)
 end
 
--- 调试热键（保留，方便排查；不影响玩家）
---   K = 正式面板    J = 最小测试菜单（验证 .menu 能否被引擎加载）
-if EEex_Key_GetFromName and EEex_Key_AddPressedListener then
+-- 调试热键（默认关，见文件顶部 C4MK_DEBUG_KEY）
+--   正式入口是先天能力「技能学习」（opcode 402）；这个 K 只是排查时的后门
+if C4MK_DEBUG_KEY and EEex_Key_GetFromName and EEex_Key_AddPressedListener then
 	C4MK_DebugKey = EEex_Key_GetFromName("k")
-	C4MK_TestKey  = EEex_Key_GetFromName("j")
 	EEex_Key_AddPressedListener(function(key)
 		if key == C4MK_DebugKey then
 			C4MK_Dbg("key K pressed")
 			C4MK_Toggle()
-		elseif key == C4MK_TestKey then
-			local ok, err = pcall(Infinity_PushMenu, "C4MKTST_Menu")
-			C4MK_Dbg("key J: test push -> " .. tostring(ok) .. " " .. tostring(err))
 		end
 	end)
 end
@@ -382,8 +394,9 @@ if EEex_Menu_LoadFile and EEex_Menu_AddAfterMainFileLoadedListener then
 		if C4MK_MenuLoaded then return end
 		local ok, err = pcall(EEex_Menu_LoadFile, "c4mksp")
 		C4MK_MenuLoaded = ok
-		pcall(print, "[C4MK] load c4mksp -> " .. tostring(ok) .. " " .. tostring(err))
-		pcall(EEex_Menu_LoadFile, "c4mktst")   -- 排查用最小菜单（按 J 打开）
+		if C4MK_DEBUG then
+			pcall(print, "[C4MK] load c4mksp -> " .. tostring(ok) .. " " .. tostring(err))
+		end
 	end)
 end
 

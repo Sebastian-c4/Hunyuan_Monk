@@ -6,6 +6,7 @@
 # 二进制资源：不做任何换行转换
 *.bam binary
 *.bmp binary
+*.png binary
 *.spl binary
 *.itm binary
 *.cre binary

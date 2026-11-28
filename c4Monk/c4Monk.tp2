@@ -26,6 +26,8 @@ LANGUAGE
 BEGIN @-101
 DESIGNATED 1
 REQUIRE_PREDICATE GAME_IS ~bgee bg2ee eet~ @-10000
+// 技能点面板走 EEex（Infinity_PushMenu / M_*.lua / .menu），没有 EEex 装了也用不了
+REQUIRE_PREDICATE ((FILE_EXISTS_IN_GAME ~M___EEex.lua~) OR (FILE_EXISTS_IN_GAME ~EEex_Sprite.lua~)) @-10001
 
 LAF run STR_VAR file=addkit file_loc=components tra=game END
 

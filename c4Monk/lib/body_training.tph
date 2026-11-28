@@ -95,6 +95,12 @@ LAF c4mk_grant_spell INT_VAR count=3 STR_VAR spell=~c4mkgb3~ ability=~c4mkbdc-~ 
 LAF c4mk_grant_spell INT_VAR count=4 STR_VAR spell=~c4mkgb4~ ability=~c4mkbdd-~ END
 LAF c4mk_grant_spell INT_VAR count=5 STR_VAR spell=~c4mkgb5~ ability=~c4mkbde-~ END
 
+// 身法满 5 级 = 高等身法的 HLA 前置（luc4monk.2da 里 AP_C4MKBDX 的 PREREQUISITE 是 AP_C4MKBDX0）。
+// opcode 313 才给这个前置"记账"；v4.5 是对话里 ReallyForceSpellRES("c4mkbdx0") 做的，v5 改面板后漏了。
+COPY_EXISTING ~c4mkgb5.spl~ ~override~
+	LPF ADD_SPELL_EFFECT INT_VAR opcode=313 target=2 timing=9 STR_VAR resource=~C4MKBDX0~ END
+BUT_ONLY
+
 
 ////高等身法
 LAF CREATE_EMPTY_SPELL STR_VAR name=c4mkbdx END

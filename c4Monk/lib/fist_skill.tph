@@ -98,20 +98,23 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 		LAF CREATE_EFFECT INT_VAR match_opcode=248 opcode=146 target=2 timing=0 parameter2=1 probability1=15 STR_VAR name=~c4mkf5%level%b~ resource=~c4mkf5%level%b.spl~ END
 
 		COPY ~%mod_root%/spl/base/c4mkfl5.spl~ ~override/c4mkf5%level%b.spl~
-			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=250 target=1 timing=0 parameter1=25 parameter2=0 END
+			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=250 target=1 timing=10 parameter1=25 parameter2=0 END
 			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=12 target=2 timing=1 dicenumber=1 dicesize=10 parameter2=1<<24 END
 			LPF CLONE_EFFECT INT_VAR match_opcode=248 opcode=139 target=1 timing=1 parameter1=RESOLVE_STR_REF (@1571) END
 			// 模板里的 248 只作克隆源，克隆完删掉（原本靠它挂 c4mkf5ex，把增益限成一次命中）
 			LPF DELETE_EFFECT INT_VAR match_opcode=248 END
 			// 248 在本击基础伤害结算之后才触发，触发那一下改不成最大伤害；
 			// 只能让随后的攻击吃伤害幸运。窗口取 23 tick（约 1.5 秒）。
-			// WeiDU 的 duration 以秒计，要精确控制 tick 只能按原始偏移写（Duration 在 effect+0x0e）。
+			// 单位看 timing：0 = Instant/Limited 但 duration 以**秒**计；10 = Instant/Limited 且以 **tick** 计。
+			// 所以必须 timing=10 + 原始 Duration=23，写 timing=0 会变成 23 秒。
+			// Timing 在 effect+0x0c（1 字节），Duration 在 effect+0x0e（4 字节）。
 			GET_OFFSET_ARRAY header SPL_V10_HEADERS
 			PHP_EACH header AS int => index BEGIN
 				GET_OFFSET_ARRAY2 efs index SPL_V10_HEAD_EFFECTS
 				PHP_EACH efs AS int => offset BEGIN
 					READ_SHORT offset found_opcode
 					PATCH_IF found_opcode=250 BEGIN
+						WRITE_BYTE offset+0x0c 10
 						WRITE_LONG offset+0x0e 23
 					END
 				END
@@ -196,6 +199,19 @@ OUTER_FOR (i=1;i<6;++i) BEGIN
 				END
 			END
 		END
+
+	// 各级是"替换"不是"叠加"：学第 i 级时先按来源法术清掉本技能线所有级别的旧效果。
+	// 否则伤害骰会变成 1+2+…+5（5 级斩铁 = 15d3 而非 5d3），
+	// 伤害/命中惩罚也会累加（5 级 = -30 伤害、+15 THAC0，明显不是设计意图）。
+	// v4.x 是靠换拳头 ITM 顺带清掉的（旧 321 指向 c4mkf<线><级>.itm，那些物品已不再生成）。
+	// 321 必须排在最前面，所以 insert_point=0。
+	OUTER_FOR (f=1;f<8;++f) BEGIN
+		COPY_EXISTING ~c4mkf%f%%level%.spl~ ~override~
+			PATCH_FOR_EACH old IN a b c d e BEGIN
+				LPF ADD_SPELL_EFFECT INT_VAR opcode=321 target=2 timing=0 duration=0 insert_point=0 STR_VAR resource=~c4mkf%f%%old%~ END
+			END
+		BUT_ONLY
+	END
 
 END
 
